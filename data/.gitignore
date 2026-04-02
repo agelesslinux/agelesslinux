@@ -1,2 +1,6 @@
 # Full clone kept locally for reference, not committed (has its own .git)
 congress-legislators/
+
+# Fax Your Rep artifacts
+fax_costs.json
+fax_*.pdf
