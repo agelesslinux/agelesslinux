@@ -3,6 +3,10 @@
 # ── Argument parsing ─────────────────────────────────────────────────────────
 
 parse_args() {
+    # Default to en-US if no lang is given (prevents deadlock for error message below)
+    set_lang "en-US"
+
+    # We do some parsin'
     for arg in "$@"; do
         case "$arg" in
             --flagrant)    FLAGRANT=1 ;;
@@ -14,17 +18,28 @@ parse_args() {
                 echo "become-ageless.sh ${AGELESS_VERSION} (${AGELESS_CODENAME})"
                 exit 0
                 ;;
+            --lang=*)
+                if [[ "${VALID_LANGS[*]}" =~ "${arg#*=}" ]]; then
+                  set_lang "${arg#*=}"
+                else
+                  echo -e "${I18N_99_ARGBLURB_WRONGLANG}"
+                  echo ""
+                  echo "${VALID_LANGS[*]}"
+                  exit 1
+                fi
+                ;;
             *)
-                echo -e "${RED}ERROR:${NC} Unknown argument: $arg"
+                echo -e "${I18N_99_ARGBLURB_UNKNOWN}: $arg"
                 echo ""
-                echo "  Usage: $0 [OPTIONS]"
+                echo "  ${I18N_99_ARGBLURB_USAGE}: $0 [OPTIONS]"
                 echo ""
-                echo "  --flagrant    Remove all compliance fig leaves"
-                echo "  --accept      Accept the legal terms non-interactively"
-                echo "  --persistent  Install agelessd daemon (24h birthDate enforcement)"
-                echo "  --dry-run     Analyze system and show planned actions without modifying"
-                echo "  --revert      Undo a previous Ageless Linux conversion"
-                echo "  --version     Show version and exit"
+                echo "  --lang=xx-YY  ${I18N_99_ARGBLURB_LANG}"
+                echo "  --flagrant    ${I18N_99_ARGBLURB_FLAGRANT}"
+                echo "  --accept      ${I18N_99_ARGBLURB_ACCEPT}"
+                echo "  --persistent  ${I18N_99_ARGBLURB_PERSISTENT}"
+                echo "  --dry-run     ${I18N_99_ARGBLURB_DRYRUN}"
+                echo "  --revert      ${I18N_99_ARGBLURB_REVERT}"
+                echo "  --version     ${I18N_99_ARGBLURB_VERSION}"
                 exit 1
                 ;;
         esac
@@ -34,7 +49,7 @@ parse_args() {
 # ── Presentation ─────────────────────────────────────────────────────────────
 
 print_banner() {
-    cat << 'BANNER'
+    cat << BANNER
 
      █████╗  ██████╗ ███████╗██╗     ███████╗███████╗███████╗
     ██╔══██╗██╔════╝ ██╔════╝██║     ██╔════╝██╔════╝██╔════╝
@@ -43,101 +58,101 @@ print_banner() {
     ██║  ██║╚██████╔╝███████╗███████╗███████╗███████║███████║
     ╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚══════╝╚══════╝╚══════╝╚══════╝
                     L   I   N   U   X
-         "Software for humans of indeterminate age"
+         "${I18N_99_MOTTO}"
 
 BANNER
-    echo -e "${BOLD}Ageless Linux Distribution Conversion Tool v${AGELESS_VERSION}${NC}"
-    echo -e "${CYAN}Codename: ${AGELESS_CODENAME}${NC}"
+    echo -e "${BOLD}${I18N_99_TITLE} v${AGELESS_VERSION}${NC}"
+    echo -e "${CYAN}${I18N_99_CODENAME}: ${AGELESS_CODENAME}${NC}"
 }
 
 print_mode_banners() {
     if [[ $FLAGRANT -eq 1 ]]; then
         echo ""
         echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-        echo -e "${RED}  FLAGRANT MODE ENABLED${NC}"
+        echo -e "${RED}  ${I18N_99_MODE_FLAGRANT_TITLE}${NC}"
         echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
         echo ""
-        echo "  In standard mode, Ageless Linux ships a stub age verification"
-        echo "  API that returns no data. This preserves the fig leaf of a"
-        echo "  'good faith effort' under § 1798.502(b)."
+        echo "  ${I18N_99_MODE_FLAGRANT_P1L1}"
+        echo "  ${I18N_99_MODE_FLAGRANT_P1L2}"
+        echo "  ${I18N_99_MODE_FLAGRANT_P1L3}"
         echo ""
-        echo "  Flagrant mode removes the fig leaf."
+        echo "  ${I18N_99_MODE_FLAGRANT_P2L1}"
         echo ""
-        echo "  No API will be installed. No interface of any kind will exist"
-        echo "  for age collection. No mechanism will be provided by which"
-        echo "  any developer could request or receive an age bracket signal."
-        echo "  The system will actively declare, in machine-readable form,"
-        echo "  that it refuses to comply."
+        echo "  ${I18N_99_MODE_FLAGRANT_P3L1}"
+        echo "  ${I18N_99_MODE_FLAGRANT_P3L2}"
+        echo "  ${I18N_99_MODE_FLAGRANT_P3L3}"
+        echo "  ${I18N_99_MODE_FLAGRANT_P3L4}"
+        echo "  ${I18N_99_MODE_FLAGRANT_P3L5}"
         echo ""
-        echo "  This mode is intended for devices that will be physically"
-        echo "  handed to children."
+        echo "  ${I18N_99_MODE_FLAGRANT_P4L1}"
+        echo "  ${I18N_99_MODE_FLAGRANT_P4L2}"
     fi
     if [[ $PERSISTENT -eq 1 ]]; then
         echo ""
         echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-        echo -e "${CYAN}  PERSISTENT MODE ENABLED${NC}"
+        echo -e "${CYAN}  ${I18N_99_MODE_PERSISTENT_TITLE}${NC}"
         echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
         echo ""
-        echo "  In addition to the one-time conversion, agelessd will be"
-        echo "  installed — a systemd timer that runs every 24 hours to ensure"
-        echo "  that systemd userdb birthDate fields remain neutralized."
+        echo "  ${I18N_99_MODE_PERSISTENT_P1L1}"
+        echo "  ${I18N_99_MODE_PERSISTENT_P1L2}"
+        echo "  ${I18N_99_MODE_PERSISTENT_P1L3}"
         echo ""
-        echo "  This guards against package updates, user creation, or desktop"
-        echo "  tools that may attempt to populate age data in the future."
+        echo "  ${I18N_99_MODE_PERSISTENT_P2L1}"
+        echo "  ${I18N_99_MODE_PERSISTENT_P2L2}"
     fi
     if [[ $DRY_RUN -eq 1 ]]; then
         echo ""
         echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-        echo -e "${YELLOW}  DRY RUN MODE${NC}"
+        echo -e "${YELLOW}  ${I18N_99_MODE_DRYRUN_TITLE}${NC}"
         echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
         echo ""
-        echo "  No changes will be made. This run will analyze your system"
-        echo "  and show exactly what would happen during a real conversion."
+        echo "  ${I18N_99_MODE_DRYRUN_P1L1}"
+        echo "  ${I18N_99_MODE_DRYRUN_P1L2}"
     fi
     echo ""
 }
 
 require_root() {
     if [[ $EUID -ne 0 ]]; then
-        echo -e "${RED}ERROR:${NC} This script must be run as root."
+        echo -e "${I18N_99_ROOTBLURB_TITLE}"
         echo ""
-        echo "  California Civil Code § 1798.500(g) defines an operating system"
-        echo "  provider as a person who 'controls the operating system software.'"
-        echo "  You cannot control the operating system software without root access."
+        echo "  ${I18N_99_ROOTBLURB_P1L1}"
+        echo "  ${I18N_99_ROOTBLURB_P1L2}"
+        echo "  ${I18N_99_ROOTBLURB_P1L3}"
         echo ""
-        echo "  Please run: sudo $0"
+        echo "  ${I18N_99_ROOTBLURB_PLEASERUN}: sudo $0"
         exit 1
     fi
 }
 
 print_analysis() {
-    echo -e "${BOLD}SYSTEM ANALYSIS${NC}"
+    echo -e "${BOLD}${I18N_99_SYSTEMANALYSIS}${NC}"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo ""
-    echo -e "  Base system:              ${CYAN}${BASE_NAME}${BASE_VERSION:+ $BASE_VERSION}${NC} (${BASE_ID})"
+    echo -e "  ${I18N_99_BASESYSTEM}:             ${CYAN}${BASE_NAME}${BASE_VERSION:+ $BASE_VERSION}${NC} (${BASE_ID})"
 
     # Display manager
     if [[ "$DM_NAME" != "unknown" ]]; then
         if [[ $USERDB_AVAILABLE -eq 1 ]]; then
-            echo -e "  Display manager:          ${YELLOW}${DM_NAME}${NC} (see warning below)"
+            echo -e "  ${I18N_99_DISPLAYMANAGER}:          ${YELLOW}${DM_NAME}${NC} (${I18N_99_SEEWARNINGBELOW})"
         else
-            echo -e "  Display manager:          ${DM_NAME}"
+            echo -e "  ${I18N_99_DISPLAYMANAGER}:          ${DM_NAME}"
         fi
     else
-        echo -e "  Display manager:          ${YELLOW}not detected${NC}"
+        echo -e "  ${I18N_99_DISPLAYMANAGER}:          ${YELLOW}${I18N_99_NOTDETECTED}${NC}"
     fi
 
     # systemd
     if [[ $HAS_SYSTEMD -eq 0 ]]; then
-        echo -e "  systemd:                  ${YELLOW}not available${NC}"
+        echo -e "  systemd:                  ${YELLOW}${I18N_99_NOTAVAILABLE}${NC}"
     elif [[ $USERDBD_INSTALLED -eq 1 ]]; then
         if [[ $USERDBD_ACTIVE -eq 1 ]]; then
-            echo -e "  systemd-userdbd:          installed, ${GREEN}active${NC}"
+            echo -e "  systemd-userdbd:          ${I18N_99_INSTALLED}, ${GREEN}${I18N_99_ACTIVE}${NC}"
         else
-            echo -e "  systemd-userdbd:          installed, inactive"
+            echo -e "  systemd-userdbd:          ${I18N_99_INSTALLED}, ${I18N_99_INACTIVE}"
         fi
     else
-        echo -e "  systemd-userdbd:          not installed"
+        echo -e "  systemd-userdbd:          ${I18N_99_NOTINSTALLED}"
     fi
 
     # /etc/userdb
@@ -146,9 +161,9 @@ print_analysis() {
         for f in /etc/userdb/*.user; do
             [[ -f "$f" ]] && userdb_file_count=$((userdb_file_count + 1))
         done
-        echo -e "  /etc/userdb/:             exists (${userdb_file_count} record(s))"
+        echo -e "  /etc/userdb/:             ${I18N_99_EXISTS} (${userdb_file_count} ${I18N_99_RECORDS})"
     else
-        echo -e "  /etc/userdb/:             does not exist"
+        echo -e "  /etc/userdb/:             ${I18N_99_DOESNOTEXIST}"
     fi
 
     # Human users
@@ -157,23 +172,23 @@ print_analysis() {
         [[ -n "$user_list" ]] && user_list+=", "
         user_list+="${HUMAN_USERS[$i]} (${HUMAN_UIDS[$i]})"
     done
-    echo -e "  Human users:              ${user_list:-none}"
+    echo -e "  ${I18N_99_HUMANUSERS}:         ${user_list:-none}"
 
     # Existing userdb records for human users
     if [[ ${#USERDB_EXISTING[@]} -gt 0 ]]; then
-        echo -e "  Existing userdb records:  ${YELLOW}${USERDB_EXISTING[*]}${NC}"
+        echo -e "  ${I18N_99_EXISTING_USERDB_RECORDS}:  ${YELLOW}${USERDB_EXISTING[*]}${NC}"
         if [[ $USERDB_BIRTHDATE_FOUND -eq 1 ]]; then
-            echo -e "                            ${YELLOW}(birthDate field detected)${NC}"
+            echo -e "                            ${YELLOW}(${I18N_99_BIRTHDATE_FIELD_DETECTED})${NC}"
         fi
     else
-        echo -e "  Existing userdb records:  none"
+        echo -e "  ${I18N_99_EXISTING_USERDB_RECORDS}:  ${I18N_99_NONE}"
     fi
 
     # Previous install
     if [[ $PREVIOUS_INSTALL -eq 1 ]]; then
         echo ""
-        echo -e "  ${YELLOW}Previous Ageless Linux installation detected.${NC}"
-        echo -e "  Run ${BOLD}sudo $0 --revert${NC} first, or this will overwrite it."
+        echo -e "  ${YELLOW}${I18N_99_PREVIOUS_AGELESS1}${NC}"
+        echo -e "  ${I18N_99_PREVIOUS_AGELESS2}"
     fi
 
     echo ""
@@ -181,24 +196,25 @@ print_analysis() {
 
 print_dm_warning() {
     if [[ "$DM_NAME" != "unknown" && $USERDB_AVAILABLE -eq 1 ]]; then
-        echo -e "  ${YELLOW}WARNING: display manager detected (${DM_NAME})${NC}"
+        echo -e "  ${YELLOW}${I18N_99_DM_DETECTED} (${DM_NAME})${NC}"
         echo ""
-        echo "  Creating userdb drop-in records mid-session can interfere"
-        echo "  with lock screen password verification (confirmed on SDDM"
-        echo "  and LightDM). To avoid this:"
+        echo "  ${I18N_99_DM_P1L1}"
+        echo "  ${I18N_99_DM_P1L2}"
+        echo "  ${I18N_99_DM_P1L3}"
         echo ""
-        echo "    1. After conversion, do NOT lock your screen."
-        echo "    2. Instead, fully log out and log back in (or reboot)."
-        echo "    3. After a fresh login, screen locking will work normally."
+        echo "    ${I18N_99_DM_P2L1}"
+        echo "    ${I18N_99_DM_P2L2}"
+        echo "    ${I18N_99_DM_P2L3}"
         echo ""
     fi
 }
 
+
 print_planned_actions() {
-    echo -e "${BOLD}PLANNED ACTIONS${NC}"
+    echo -e "${BOLD}${I18N_99_PLANNED_TITLE}${NC}"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo ""
-    echo "  The following changes will be made to this system:"
+    echo "  ${I18N_99_PLANNED_BRIEF}"
     echo ""
 
     ACTION_NUM=1
@@ -211,11 +227,11 @@ print_planned_actions() {
 
     echo ""
     if [[ $USERDB_AVAILABLE -eq 1 ]]; then
-        echo "  NOTE: systemd-userdbd will NOT be reloaded during this session."
-        echo "        Userdb changes take effect after your next login or reboot."
+        echo "  ${I18N_99_PLANNED_USERDB1}"
+        echo "        ${I18N_99_PLANNED_USERDB2}"
         echo ""
     fi
-    echo "  To revert all changes later:"
+    echo "  ${I18N_99_PLANNED_REVERT}"
     echo "    sudo become-ageless.sh --revert"
     echo ""
 }
@@ -228,9 +244,9 @@ print_dry_run_exit() {
 
     echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
-    echo -e "  ${BOLD}Dry run complete. No changes were made.${NC}"
+    echo -e "  ${BOLD}${I18N_99_DRYRUN_BLURB1}${NC}"
     echo ""
-    echo "  To perform the conversion, run without --dry-run:"
+    echo "  ${I18N_99_DRYRUN_BLURB2}"
     echo ""
     echo "    $cmd"
     echo ""
@@ -239,30 +255,30 @@ print_dry_run_exit() {
 }
 
 print_legal_notice() {
-    echo -e "${BOLD}LEGAL NOTICE${NC}"
+    echo -e "${BOLD}${I18N_99_LEGALNOTICE_TITLE}${NC}"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo ""
-    echo "  By converting this system to Ageless Linux, you acknowledge that:"
+    echo "  ${I18N_99_LEGALNOTICE_BRIEF}"
     echo ""
-    echo "  1. You are becoming an operating system provider as defined by"
-    echo "     California Civil Code § 1798.500(g)."
+    echo "  ${I18N_99_LEGALNOTICE_P1L1}"
+    echo "     ${I18N_99_LEGALNOTICE_P1L2}"
     echo ""
-    echo "  2. As of January 1, 2027, you are required by § 1798.501(a)(1)"
-    echo "     to 'provide an accessible interface at account setup that"
-    echo "     requires an account holder to indicate the birth date, age,"
-    echo "     or both, of the user of that device.'"
+    echo "  ${I18N_99_LEGALNOTICE_P2L1}"
+    echo "     ${I18N_99_LEGALNOTICE_P2L2}"
+    echo "     ${I18N_99_LEGALNOTICE_P2L3}"
+    echo "     ${I18N_99_LEGALNOTICE_P2L4}"
     echo ""
-    echo "  3. Ageless Linux provides no such interface."
+    echo "  ${I18N_99_LEGALNOTICE_P3L1}"
     echo ""
-    echo "  4. Ageless Linux provides no 'reasonably consistent real-time"
-    echo "     application programming interface' for age bracket signals"
-    echo "     as required by § 1798.501(a)(2)."
+    echo "  ${I18N_99_LEGALNOTICE_P4L1}"
+    echo "     ${I18N_99_LEGALNOTICE_P4L2}"
+    echo "     ${I18N_99_LEGALNOTICE_P4L3}"
     echo ""
-    echo "  5. You may be subject to civil penalties of up to \$2,500 per"
-    echo "     affected child per negligent violation, or \$7,500 per"
-    echo "     affected child per intentional violation."
+    echo "  ${I18N_99_LEGALNOTICE_P5L1}"
+    echo "     ${I18N_99_LEGALNOTICE_P5L2}"
+    echo "     ${I18N_99_LEGALNOTICE_P5L3}"
     echo ""
-    echo "  6. This is intentional."
+    echo "  ${I18N_99_LEGALNOTICE_P6L1}"
     echo ""
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo ""
@@ -270,23 +286,23 @@ print_legal_notice() {
 
 accept_terms() {
     if [[ $ACCEPT -eq 1 ]]; then
-        echo -e "${YELLOW}--accept: legal terms accepted non-interactively.${NC}"
+        echo -e "${YELLOW}--accept: ${I18N_99_LEGALTERMS_ACCEPTED_NONINT}.${NC}"
     elif [[ -t 0 ]]; then
-        read -rp "Do you accept these terms and wish to become an OS provider? [y/N] " accept
-        if [[ ! "$accept" =~ ^[Yy]$ ]]; then
+        read -rp "${I18N_99_LEGALTERMS_PROMPT} " accept
+        if [[ ! "$accept" =~ ^[YySs]$ ]]; then
             echo ""
-            echo "Installation cancelled. You remain a mere user."
-            echo "The California Attorney General has no business with you today."
+            echo "${I18N_99_LEGALTERMS_NAY1}"
+            echo "${I18N_99_LEGALTERMS_NAY2}"
             exit 0
         fi
     else
         echo ""
-        echo -e "${RED}ERROR:${NC} No TTY available for interactive confirmation."
+        echo -e "${I18N_99_LEGALTERMS_NOTTY}"
         echo ""
-        echo "  This script requires you to accept legal terms acknowledging that"
-        echo "  you are becoming an operating system provider under Cal. Civ. Code"
-        echo "  § 1798.500(g). In a non-interactive environment (e.g. piped from"
-        echo "  curl), pass --accept to confirm:"
+        echo "  ${I18N_99_LEGALTERMS_NOTTY_BLURB1}"
+        echo "  ${I18N_99_LEGALTERMS_NOTTY_BLURB2}"
+        echo "  ${I18N_99_LEGALTERMS_NOTTY_BLURB3}"
+        echo "  ${I18N_99_LEGALTERMS_NOTTY_BLURB4}"
         echo ""
         echo "  curl -fsSL https://agelesslinux.org/become-ageless.sh | sudo bash -s -- --accept"
         echo "  curl -fsSL https://agelesslinux.org/become-ageless.sh | sudo bash -s -- --accept --flagrant"
@@ -299,7 +315,7 @@ accept_terms() {
 
 execute_all() {
     echo ""
-    echo -e "${GREEN}Converting system to Ageless Linux...${NC}"
+    echo -e "${GREEN}${I18N_99_EXECUTE_ALL}${NC}"
     echo ""
 
     execute_os_release
@@ -316,79 +332,79 @@ print_summary() {
     if [[ $FLAGRANT -eq 1 ]]; then
         echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
         echo ""
-        echo -e "  ${BOLD}Conversion complete. FLAGRANT MODE.${NC}"
+        echo -e "  ${BOLD}${I18N_99_SUMMARY_COMPLETE} ${I18N_99_SUMMARY_FLAGRANT}${NC}"
         echo ""
-        echo -e "  You are now running ${CYAN}Ageless Linux ${AGELESS_VERSION} (${AGELESS_CODENAME})${NC}"
-        echo -e "  Based on: ${BASE_NAME}${BASE_VERSION:+ $BASE_VERSION}"
+        echo -e "  ${I18N_99_SUMMARY_BLURB1} ${CYAN}Ageless Linux ${AGELESS_VERSION} (${AGELESS_CODENAME})${NC}"
+        echo -e "  ${I18N_99_SUMMARY_BLURB2}: ${BASE_NAME}${BASE_VERSION:+ $BASE_VERSION}"
         echo ""
-        echo -e "  You are now an ${BOLD}operating system provider${NC} as defined by"
-        echo -e "  California Civil Code § 1798.500(g)."
+        echo -e "  ${I18N_99_SUMMARY_BLURB3}"
+        echo -e "  ${I18N_99_SUMMARY_BLURB4}"
         echo ""
-        echo -e "  ${RED}Compliance status: FLAGRANTLY NONCOMPLIANT${NC}"
+        echo -e "  ${RED}${I18N_99_SUMMARY_STATUS_BLURB}: ${I18N_99_SUMMARY_STATUS_FLAGRANT}${NC}"
         echo ""
-        echo -e "  No age verification API has been installed."
-        echo -e "  No age collection interface has been created."
-        echo -e "  No mechanism exists for any developer to request"
-        echo -e "  or receive an age bracket signal from this device."
+        echo -e "  ${I18N_99_SUMMARY_FLAGRANT_BLURB1}"
+        echo -e "  ${I18N_99_SUMMARY_FLAGRANT_BLURB2}"
+        echo -e "  ${I18N_99_SUMMARY_FLAGRANT_BLURB3}"
+        echo -e "  ${I18N_99_SUMMARY_FLAGRANT_BLURB4}"
         echo ""
-        echo -e "  This system is ready to be handed to a child."
+        echo -e "  ${I18N_99_SUMMARY_FLAGRANT_BLURB5}"
         echo ""
-        echo -e "  Files created:"
+        echo -e "  ${I18N_99_SUMMARY_FILESCREATED}:"
         summary_os_release
         summary_compliance
         summary_userdb
         summary_agelessd
         echo ""
-        echo -e "  Installation record: ${CONF_PATH}"
+        echo -e "  ${I18N_99_SUMMARY_INSTALLATIONRECORD}: ${CONF_PATH}"
         echo ""
-        echo -e "  To revert: ${BOLD}sudo become-ageless.sh --revert${NC}"
+        echo -e "  ${I18N_99_SUMMARY_TOREVERT}: ${BOLD}sudo become-ageless.sh --revert${NC}"
         echo ""
         if [[ "$DM_NAME" != "unknown" && $USERDB_AVAILABLE -eq 1 ]]; then
-            echo -e "  ${YELLOW}IMPORTANT: Do NOT lock your screen. Log out and back in (or reboot)"
-            echo -e "  first. Your lock screen may reject your password until you do.${NC}"
-            echo ""
+            echo -e "  ${YELLOW}${I18N_99_SUMMARY_LOCKBLURB1}"
+            echo -e "  ${I18N_99_SUMMARY_LOCKBLURB2}"
+            echo -e "  ${I18N_99_SUMMARY_LOCKBLURB3}${NC}"
         elif [[ $USERDB_AVAILABLE -eq 1 ]]; then
-            echo -e "  ${YELLOW}Log out and back in (or reboot) for userdb changes to take effect.${NC}"
-            echo ""
+            echo -e "  ${YELLOW}${I18N_99_SUMMARY_LOGOUTBLURB}${NC}"
         fi
+        echo ""
         echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
         echo ""
-        echo -e "  ${BOLD}Welcome to Ageless Linux. We refused to ask how old you are.${NC}"
+        echo -e "  ${BOLD}${I18N_99_SUMMARY_GREETING} ${I18N_99_SUMMARY_GREETING_FLAGRANT}${NC}"
         echo ""
     else
         echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
         echo ""
-        echo -e "  ${BOLD}Conversion complete.${NC}"
+        echo -e "  ${BOLD}${I18N_99_SUMMARY_COMPLETE}${NC}"
         echo ""
-        echo -e "  You are now running ${CYAN}Ageless Linux ${AGELESS_VERSION} (${AGELESS_CODENAME})${NC}"
-        echo -e "  Based on: ${BASE_NAME}${BASE_VERSION:+ $BASE_VERSION}"
+        echo -e "  ${I18N_99_SUMMARY_BLURB1} ${CYAN}Ageless Linux ${AGELESS_VERSION} (${AGELESS_CODENAME})${NC}"
+        echo -e "  ${I18N_99_SUMMARY_BLURB2}: ${BASE_NAME}${BASE_VERSION:+ $BASE_VERSION}"
         echo ""
-        echo -e "  You are now an ${BOLD}operating system provider${NC} as defined by"
-        echo -e "  California Civil Code § 1798.500(g)."
+        echo -e "  ${I18N_99_SUMMARY_BLURB3}"
+        echo -e "  ${I18N_99_SUMMARY_BLURB4}"
         echo ""
-        echo -e "  ${YELLOW}Compliance status: INTENTIONALLY NONCOMPLIANT${NC}"
+        echo -e "  ${RED}${I18N_99_SUMMARY_STATUS_BLURB}: ${I18N_99_SUMMARY_STATUS_STANDARD}${NC}"
         echo ""
-        echo -e "  Files created:"
+        echo -e "  ${I18N_99_SUMMARY_FILESCREATED}:"
         summary_os_release
         summary_compliance
         summary_userdb
         summary_agelessd
         echo ""
-        echo -e "  Installation record: ${CONF_PATH}"
+        echo -e "  ${I18N_99_SUMMARY_INSTALLATIONRECORD}: ${CONF_PATH}"
         echo ""
-        echo -e "  To revert: ${BOLD}sudo become-ageless.sh --revert${NC}"
+        echo -e "  ${I18N_99_SUMMARY_TOREVERT}: ${BOLD}sudo become-ageless.sh --revert${NC}"
         echo ""
         if [[ "$DM_NAME" != "unknown" && $USERDB_AVAILABLE -eq 1 ]]; then
-            echo -e "  ${YELLOW}IMPORTANT: Do NOT lock your screen. Log out and back in (or reboot)"
-            echo -e "  first. Your lock screen may reject your password until you do.${NC}"
-            echo ""
+            echo -e "  ${YELLOW}${I18N_99_SUMMARY_LOCKBLURB1}"
+            echo -e "  ${I18N_99_SUMMARY_LOCKBLURB2}"
+            echo -e "  ${I18N_99_SUMMARY_LOCKBLURB3}${NC}"
         elif [[ $USERDB_AVAILABLE -eq 1 ]]; then
-            echo -e "  ${YELLOW}Log out and back in (or reboot) for userdb changes to take effect.${NC}"
-            echo ""
+            echo -e "  ${YELLOW}${I18N_99_SUMMARY_LOGOUTBLURB}${NC}"
         fi
+        echo ""
         echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
         echo ""
-        echo -e "  ${BOLD}Welcome to Ageless Linux. You have no idea how old we are.${NC}"
+        echo -e "  ${BOLD}${I18N_99_SUMMARY_GREETING} ${I18N_99_SUMMARY_GREETING_STANDARD}${NC}"
         echo ""
     fi
 }
@@ -398,13 +414,13 @@ print_summary() {
 revert_no_conf() {
     # Handle v0.0.4 installations that didn't write a conf file
     if [[ -f /etc/os-release.pre-ageless ]]; then
-        echo -e "${YELLOW}WARNING:${NC} No /etc/agelesslinux.conf found."
+        echo -e "${I18N_99_REVERT_NOCONF_TITLE}"
         echo ""
-        echo "  It appears this system was converted by an older version of"
-        echo "  become-ageless.sh (v0.0.4 or earlier) that did not write a"
-        echo "  configuration file. Automatic revert is not possible."
+        echo "  ${I18N_99_REVERT_NOCONF_BRIEF1}"
+        echo "  ${I18N_99_REVERT_NOCONF_BRIEF2}"
+        echo "  ${I18N_99_REVERT_NOCONF_BRIEF3}"
         echo ""
-        echo "  To manually revert, run:"
+        echo "  ${I18N_99_REVERT_NOCONF_TOREVERT}"
         echo ""
         echo "    sudo cp /etc/os-release.pre-ageless /etc/os-release"
         echo "    sudo rm -f /etc/os-release.pre-ageless"
@@ -427,21 +443,22 @@ revert_no_conf() {
             fi
         fi
         echo ""
-        echo "  Then fully log out and log back in (or reboot)."
+        echo "  ${I18N_99_REVERT_NOCONF_LOGOUT}"
     else
-        echo "  No Ageless Linux installation found on this system."
-        echo "  (No /etc/agelesslinux.conf and no /etc/os-release.pre-ageless)"
+        echo "  ${I18N_99_REVERT_NOCONF_NOTFOUND1}"
+        echo "  ${I18N_99_REVERT_NOCONF_NOTFOUND2}"
     fi
 }
 
+
 revert_all() {
     echo ""
-    echo -e "${BOLD}Ageless Linux Revert Tool v${AGELESS_VERSION}${NC}"
+    echo -e "${BOLD}${I18N_99_REVERT_TITLE} v${AGELESS_VERSION}${NC}"
     echo ""
 
     if [[ $EUID -ne 0 ]]; then
-        echo -e "${RED}ERROR:${NC} This script must be run as root."
-        echo "  Please run: sudo $0 --revert"
+        echo -e "${I18N_99_ROOTBLURB_TITLE}"
+        echo "  ${I18N_99_ROOTBLURB_PLEASERUN}: sudo $0 --revert"
         exit 1
     fi
 
@@ -453,15 +470,16 @@ revert_all() {
     # shellcheck disable=SC1090
     source "$CONF_PATH"
 
-    echo -e "  Found installation record: Ageless Linux ${AGELESS_VERSION:-unknown}"
-    echo -e "  Installed: ${AGELESS_DATE:-unknown}"
+
+    echo -e "  ${I18N_99_FOUNDINSTALL}: Ageless Linux ${AGELESS_VERSION:-unknown}"
+    echo -e "  ${I18N_99_INSTALLED}: ${AGELESS_DATE:-unknown}"
     if [[ "${AGELESS_FLAGRANT:-0}" == "1" ]]; then
-        echo -e "  Mode: ${RED}flagrant${NC}"
+        echo -e "  ${I18N_99_MODE}: ${RED}${I18N_99_FLAGRANT}${NC}"
     else
-        echo -e "  Mode: standard"
+        echo -e "  ${I18N_99_MODE}: ${I18N_99_STANDARD}"
     fi
     echo ""
-    echo -e "  ${BOLD}Reverting Ageless Linux conversion...${NC}"
+    echo -e "  ${BOLD}${I18N_99_REVERTING}${NC}"
     echo ""
 
     revert_os_release
@@ -471,20 +489,20 @@ revert_all() {
 
     # Remove conf file
     rm -f "$CONF_PATH"
-    echo -e "  [${GREEN}✓${NC}] Removed $CONF_PATH"
+    echo -e "  [${GREEN}✓${NC}] ${I18N_99_REMOVED} $CONF_PATH"
 
     echo ""
     echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
-    echo -e "  ${BOLD}Revert complete.${NC}"
+    echo -e "  ${BOLD}${I18N_99_REVERT_COMPLETE}${NC}"
     echo ""
-    echo -e "  Your system has been restored to ${CYAN}${AGELESS_BASE_NAME:-your original distro}${AGELESS_BASE_VERSION:+ $AGELESS_BASE_VERSION}${NC}."
+    echo -e "  ${I18N_99_REVERT_RESTORED} ${CYAN}${AGELESS_BASE_NAME:-your original distro}${AGELESS_BASE_VERSION:+ $AGELESS_BASE_VERSION}${NC}."
     echo ""
-    echo -e "  You are no longer an operating system provider."
-    echo -e "  The California Attorney General has no business with you today."
+    echo -e "  ${I18N_99_REVERT_BLURB1}"
+    echo -e "  ${I18N_99_REVERT_BLURB2}"
     echo ""
-    echo -e "  ${YELLOW}Please fully log out and log back in (or reboot) for all"
-    echo -e "  changes to take effect.${NC}"
+    echo -e "  ${YELLOW}${I18N_99_REVERT_LOGOUTBLURB1}"
+    echo -e "  ${I18N_99_REVERT_LOGOUTBLURB2}${NC}"
     echo ""
     echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
@@ -523,8 +541,8 @@ main() {
 
     # Hard error: --persistent without systemd
     if [[ $PERSISTENT -eq 1 && $HAS_SYSTEMD -eq 0 ]]; then
-        echo -e "${RED}ERROR:${NC} --persistent requires systemd, which is not available on this system."
-        echo "  Remove --persistent to proceed without the agelessd daemon."
+        echo -e "${I18N_99_PERSISTENT_BLURB1}"
+        echo "  ${I18N_99_PERSISTENT_BLURB2}"
         exit 1
     fi
 
@@ -538,3 +556,4 @@ main() {
     # Done
     print_summary
 }
+

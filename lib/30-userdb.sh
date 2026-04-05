@@ -1,4 +1,6 @@
 # §§ USERDB — systemd userdb birthDate neutralization
+# ===========================================================================
+# [EN-US]
 #
 #    systemd PR #40954 (merged 2026-03-18) added a birthDate field to JSON
 #    user records. This field feeds age data to xdg-desktop-portal for
@@ -13,6 +15,24 @@
 #    (SDDM, LightDM, and potentially others) to lose the ability to verify
 #    passwords on the lock screen. The drop-in records are picked up
 #    automatically on next boot or login.
+# ===========================================================================
+# [PT-BR]
+#
+#    O PR #40954 do systemd (merjado em 18/03/2026) adicionou um campo
+#    birthDate nos registros JSON. Este campo fomenta dados de idade ao
+#    xdg-desktop-portal para tornar possível restrições de idade a nível
+#    de aplicativo. Nós neutralizamos isso para todos os usuários.
+#
+#    Insere registros substitutos no NSS fantasma /etc/userdb/, de forma que
+#    cada registro inclua o set completo de campos do passwd
+#    (uid, gid, home, shell) para evitar quebra do parseamento do usuário.
+#
+#    NOTA: Nós NÃO recarregamos o systemd-userdbd depois de criar os registros.
+#    Criar ou recarregar os registros durante uma sessão de login faz os
+#    display managers (SDDM, LightDM, e potencialmente outros) perderem a
+#    habilidade de verificar senhas na tela de bloqueio. Os registros são
+#    lidos automaticamente no próximo boot ou login.
+# ===========================================================================
 
 analyze_userdb() {
     # Detect systemd
@@ -95,7 +115,7 @@ analyze_userdb() {
 plan_userdb() {
     if [[ $USERDB_AVAILABLE -eq 0 ]]; then
         echo ""
-        echo -e "  ${YELLOW}Skipping userdb neutralization (systemd-userdbd not present)${NC}"
+        echo -e "  ${YELLOW}${I18N_30_SKIPPED_USERDB}${NC}"
         echo ""
         return
     fi
@@ -108,30 +128,30 @@ plan_userdb() {
     fi
 
     if [[ $USERDB_DIR_EXISTS -eq 0 ]]; then
-        plan_action "Create /etc/userdb/ directory"
+        plan_action "${I18N_30_CREATE_USERDB}"
     fi
 
     for username in "${USERDB_EXISTING[@]+"${USERDB_EXISTING[@]}"}"; do
-        plan_action "Back up /etc/userdb/${username}.user -> ${username}.user.pre-ageless"
-        plan_action "Update /etc/userdb/${username}.user (birthDate = ${birthdate})"
+        plan_action "${I18N_30_BACKUP} /etc/userdb/${username}.user -> ${username}.user.pre-ageless"
+        plan_action "${I18N_30_UPDATE} /etc/userdb/${username}.user (birthDate = ${birthdate})"
     done
 
     for username in "${USERDB_NEW[@]+"${USERDB_NEW[@]}"}"; do
-        plan_action "Create /etc/userdb/${username}.user (birthDate = ${birthdate})"
+        plan_action "${I18N_30_CREATE} /etc/userdb/${username}.user (birthDate = ${birthdate})"
     done
 }
 
 execute_userdb() {
     echo ""
-    echo -e "  ${BOLD}Neutralizing systemd userdb birthDate field...${NC}"
+    echo -e "  ${BOLD}${I18N_30_USERDB_BLURB1}${NC}"
     echo ""
-    echo "  systemd PR #40954 (merged 2026-03-18) added a birthDate field to"
-    echo "  JSON user records, intended to serve age verification data to"
-    echo "  applications via xdg-desktop-portal."
+    echo "  ${I18N_30_USERDB_BLURB2}"
+    echo "  ${I18N_30_USERDB_BLURB3}"
+    echo "  ${I18N_30_USERDB_BLURB4}"
     echo ""
 
     if [[ $USERDB_AVAILABLE -eq 0 ]]; then
-        echo -e "  [${YELLOW}~${NC}] systemd-userdbd not present — skipping userdb neutralization"
+        echo -e "  [${YELLOW}~${NC}] ${I18N_30_USERDB_SKIPPED}"
         echo ""
         return
     fi
@@ -184,7 +204,7 @@ with open(fp, "w") as f:
 ' "$userdb_file" "$ageless_mode" \
                       "$username" "$uid" "$gid" "$realname" "$homedir" "$shell"
                 else
-                    echo -e "  [${YELLOW}!${NC}] ${username}: existing ${userdb_file} requires python3 to merge safely, skipping"
+                    echo -e "  [${YELLOW}!${NC}] ${username}: ${I18N_30_USERDB_EXISTING} ${userdb_file} ${I18N_30_USERDB_REQUIRE_PYTHON3}"
                     continue
                 fi
             else
@@ -222,12 +242,12 @@ with open(fp, "w") as f:
     USERDB_COUNT=$userdb_count
 
     echo ""
-    echo -e "  ${userdb_count} user(s) neutralized."
+    echo -e "  ${userdb_count} ${I18N_30_USERDB_ENDBLURB1}"
     echo ""
-    echo -e "  ${YELLOW}NOTE:${NC} systemd-userdbd has NOT been reloaded. Userdb changes will"
-    echo -e "  take effect after your next login or reboot."
+    echo -e "  ${I18N_30_USERDB_ENDBLURB2}"
+    echo -e "  ${I18N_30_USERDB_ENDBLURB3}"
     if [[ "$DM_NAME" != "unknown" ]]; then
-        echo -e "  ${YELLOW}WARNING:${NC} Do NOT lock your screen before logging out/rebooting."
+        echo -e "  ${I18N_30_USERDB_LOCKBLURB}"
     fi
 }
 
@@ -237,7 +257,7 @@ revert_userdb() {
         for username in $AGELESS_USERDB_CREATED; do
             if [[ -f "/etc/userdb/${username}.user" ]]; then
                 rm -f "/etc/userdb/${username}.user"
-                echo -e "  [${GREEN}✓${NC}] Removed /etc/userdb/${username}.user"
+                echo -e "  [${GREEN}✓${NC}] ${I18N_30_REMOVED} /etc/userdb/${username}.user"
             fi
         done
     fi
@@ -247,7 +267,7 @@ revert_userdb() {
         for username in $AGELESS_USERDB_BACKED_UP; do
             if [[ -f "/etc/userdb/${username}.user.pre-ageless" ]]; then
                 mv "/etc/userdb/${username}.user.pre-ageless" "/etc/userdb/${username}.user"
-                echo -e "  [${GREEN}✓${NC}] Restored /etc/userdb/${username}.user from backup"
+                echo -e "  [${GREEN}✓${NC}] ${I18N_30_RESTORED} /etc/userdb/${username}.user ${I18N_30_FROMBACKUP}"
             fi
         done
     fi
@@ -256,9 +276,9 @@ revert_userdb() {
     if [[ "${AGELESS_USERDB_DIR_CREATED:-0}" == "1" ]] && [[ -d /etc/userdb ]]; then
         if [[ -z "$(ls -A /etc/userdb 2>/dev/null)" ]]; then
             rmdir /etc/userdb
-            echo -e "  [${GREEN}✓${NC}] Removed empty /etc/userdb/"
+            echo -e "  [${GREEN}✓${NC}] ${I18N_30_REMOVEDEMPTY} /etc/userdb/"
         else
-            echo -e "  [${YELLOW}~${NC}] /etc/userdb/ not empty, leaving in place"
+            echo -e "  [${YELLOW}~${NC}] /etc/userdb/ ${I18N_30_NOTEMPTY}"
         fi
     fi
 
@@ -266,7 +286,7 @@ revert_userdb() {
     if command -v systemctl &>/dev/null; then
         if systemctl list-unit-files systemd-userdbd.service &>/dev/null 2>&1; then
             systemctl try-reload-or-restart systemd-userdbd.service 2>/dev/null || true
-            echo -e "  [${GREEN}✓${NC}] Reloaded systemd-userdbd"
+            echo -e "  [${GREEN}✓${NC}] ${I18N_30_RELOADED} systemd-userdbd"
         fi
     fi
 }
@@ -274,15 +294,15 @@ revert_userdb() {
 summary_userdb() {
     if [[ $USERDB_AVAILABLE -eq 0 ]]; then
         echo ""
-        echo -e "  userdb birthDate: ${YELLOW}skipped (systemd-userdbd not present)${NC}"
+        echo -e "  userdb birthDate: ${YELLOW}${I18N_30_SUMMARY_USERDB_SKIPPED}${NC}"
         return
     fi
 
     echo ""
     echo -e "  userdb birthDate (systemd PR #40954):"
     if [[ $FLAGRANT -eq 1 ]]; then
-        echo -e "    /etc/userdb/*.user ..................... ${USERDB_COUNT:-0} user(s) → ${RED}null${NC}"
+        echo -e "    /etc/userdb/*.user ..................... ${USERDB_COUNT:-0} ${I18N_30_SUMMARY_USERS} → ${RED}null${NC}"
     else
-        echo -e "    /etc/userdb/*.user ............. ${USERDB_COUNT:-0} user(s) → 1970-01-01"
+        echo -e "    /etc/userdb/*.user ............. ${USERDB_COUNT:-0} ${I18N_30_SUMMARY_USERS} → 1970-01-01"
     fi
 }

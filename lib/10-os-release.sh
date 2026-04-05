@@ -22,15 +22,15 @@ analyze_os_release() {
 
 plan_os_release() {
     if [[ ! -f /etc/os-release.pre-ageless ]]; then
-        plan_action "Back up /etc/os-release -> /etc/os-release.pre-ageless"
+        plan_action "${I18N_10_BACKUP_OSRELEASE}"
     fi
-    plan_action "Rewrite /etc/os-release as Ageless Linux ${AGELESS_VERSION}"
+    plan_action "${I18N_10_REWRITE_OSRELEASE}"
 
     if [[ -f /etc/lsb-release ]]; then
         if [[ ! -f /etc/lsb-release.pre-ageless ]]; then
-            plan_action "Back up /etc/lsb-release -> /etc/lsb-release.pre-ageless"
+            plan_action "${I18N_10_BACKUP_LSBRELEASE}"
         fi
-        plan_action "Rewrite /etc/lsb-release as Ageless Linux ${AGELESS_VERSION}"
+        plan_action "${I18N_10_REWRITE_LSBRELEASE}"
     fi
 }
 
@@ -40,10 +40,10 @@ execute_os_release() {
     if [[ ! -f "$backup" ]]; then
         cp /etc/os-release "$backup"
         CONF_BACKED_UP_OS_RELEASE=1
-        echo -e "  [${GREEN}✓${NC}] Backed up original /etc/os-release to $backup"
+        echo -e "  [${GREEN}✓${NC}] ${I18N_10_BACKEDUP_OSRELEASE} $backup"
     else
         CONF_BACKED_UP_OS_RELEASE=1
-        echo -e "  [${YELLOW}~${NC}] Backup already exists at $backup (previous conversion?)"
+        echo -e "  [${YELLOW}~${NC}] ${I18N_10_BACKUPEXISTS_OSRELEASE} $backup ${I18N_10_BACKUPEXISTS2_OSRELEASE}"
     fi
 
     # Determine compliance strings
@@ -76,7 +76,7 @@ AGELESS_AB1043_COMPLIANCE="${compliance_status}"
 AGELESS_AGE_VERIFICATION_API="${api_status}"
 AGELESS_AGE_VERIFICATION_STATUS="${verification_status}"
 EOF
-    echo -e "  [${GREEN}✓${NC}] Wrote new /etc/os-release"
+echo -e "  [${GREEN}✓${NC}] ${I18N_10_WROTENEW_OSRELEASE}"
 
     # Write lsb-release if it exists
     if [[ -f /etc/lsb-release ]]; then
@@ -92,7 +92,7 @@ DISTRIB_RELEASE=${AGELESS_VERSION}
 DISTRIB_CODENAME=${AGELESS_CODENAME,,}
 DISTRIB_DESCRIPTION="Ageless Linux ${AGELESS_VERSION} (${AGELESS_CODENAME})"
 EOF
-        echo -e "  [${GREEN}✓${NC}] Updated /etc/lsb-release"
+        echo -e "  [${GREEN}✓${NC}] ${I18N_10_UPDATED_LSBRELEASE}"
     fi
 }
 
@@ -100,17 +100,17 @@ revert_os_release() {
     if [[ "${AGELESS_BACKED_UP_OS_RELEASE:-0}" == "1" ]] && [[ -f /etc/os-release.pre-ageless ]]; then
         cp /etc/os-release.pre-ageless /etc/os-release
         rm -f /etc/os-release.pre-ageless
-        echo -e "  [${GREEN}✓${NC}] Restored /etc/os-release"
+        echo -e "  [${GREEN}✓${NC}] ${I18N_10_RESTORED_OSRELEASE}"
     fi
 
     if [[ "${AGELESS_BACKED_UP_LSB_RELEASE:-0}" == "1" ]] && [[ -f /etc/lsb-release.pre-ageless ]]; then
         cp /etc/lsb-release.pre-ageless /etc/lsb-release
         rm -f /etc/lsb-release.pre-ageless
-        echo -e "  [${GREEN}✓${NC}] Restored /etc/lsb-release"
+        echo -e "  [${GREEN}✓${NC}] ${I18N_10_RESTORED_LSBRELEASE}"
     fi
 }
 
 summary_os_release() {
-    echo -e "    /etc/os-release ................ OS identity (modified)"
-    echo -e "    /etc/os-release.pre-ageless .... Original OS identity (backup)"
+    echo -e "    /etc/os-release ................ ${I18N_10_SUMMARY_OSRELEASE}"
+    echo -e "    /etc/os-release.pre-ageless .... ${I18N_10_SUMMARY_OSRELEASE_PREAGELESS}"
 }

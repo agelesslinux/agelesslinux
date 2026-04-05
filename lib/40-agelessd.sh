@@ -13,13 +13,13 @@ plan_agelessd() {
 
     if [[ $HAS_SYSTEMD -eq 0 ]]; then
         echo ""
-        echo -e "  ${RED}ERROR: --persistent requires systemd (not available on this system)${NC}"
+        echo -e "  ${RED}${I18N_40_SYSTEMD_NOT_AVAILABLE}${NC}"
         echo ""
         return
     fi
 
-    plan_action "Install /etc/ageless/agelessd (neutralization script)"
-    plan_action "Install agelessd.service and agelessd.timer (24h enforcement)"
+    plan_action "${I18N_40_INSTALL_AGELESSD}"
+    plan_action "${I18N_40_INSTALL_AGELESSD_SERVICE}"
 }
 
 execute_agelessd() {
@@ -28,7 +28,7 @@ execute_agelessd() {
     fi
 
     echo ""
-    echo -e "  ${BOLD}Installing agelessd persistent daemon...${NC}"
+    echo -e "  ${BOLD}${I18N_INSTALLING_AGELESSD}${NC}"
     echo ""
 
     local ageless_mode
@@ -43,16 +43,28 @@ execute_agelessd() {
     cat > /etc/ageless/agelessd << 'AGELESSD_EOF'
 #!/bin/bash
 # ============================================================================
-#  agelessd — Ageless Linux birthDate Neutralization Daemon
+# [EN-US]
+# agelessd — Ageless Linux birthDate Neutralization Daemon
 #
-#  Ensures systemd userdb birthDate fields (PR #40954) remain neutralized.
-#  Runs every 24 hours via systemd timer.
+# Ensures systemd userdb birthDate fields (PR #40954) remain neutralized.
+# Runs every 24 hours via systemd timer.
 #
-#  NOTE: This daemon does NOT reload systemd-userdbd after writing records.
-#  Reloading mid-session can break display manager lock screens (SDDM, LightDM, etc).
-#  Changes take effect on next login or boot.
+# NOTE: This daemon does NOT reload systemd-userdbd after writing records.
+# Reloading mid-session can break display manager lock screens (SDDM, LightDM, etc).
+# Changes take effect on next login or boot.
+# ============================================================================
+# [PT-BR]
+# agelessd — Daemon de Neutralização de birthdate do Ageless Linux
 #
-#  SPDX-License-Identifier: Unlicense
+# Garante que os campos de birthDate do userdb do systemd (PR #40954)
+# permaneçam neutralizados. Roda a cada 24 horas via timer do systemd.
+#
+# NOTA: Este daemon NÃO recarrega o systemd-userdbd depois de escrever
+# os registros. Recarregar durante uma sessão pode quebrar as telas de
+# bloqueio do display manager (SDDM, LightDM, etc.).
+# As mudanças são aplicadas no próximo login ou boot.
+# ============================================================================
+# SPDX-License-Identifier: Unlicense
 # ============================================================================
 
 set -euo pipefail
@@ -146,9 +158,9 @@ TMREOF
 
     CONF_AGELESSD_INSTALLED=1
 
-    echo -e "  [${GREEN}✓${NC}] Installed /etc/ageless/agelessd"
-    echo -e "  [${GREEN}✓${NC}] Installed agelessd.service"
-    echo -e "  [${GREEN}✓${NC}] Installed and started agelessd.timer (24h interval)"
+    echo -e "  [${GREEN}✓${NC}] ${I18N_40_INSTALLED_AGELESSD}"
+    echo -e "  [${GREEN}✓${NC}] ${I18N_40_INSTALLED_AGELESSD_SERVICE}"
+    echo -e "  [${GREEN}✓${NC}] ${I18N_40_INSTALLED_AGELESSD_TIMER}"
 }
 
 revert_agelessd() {
@@ -157,7 +169,7 @@ revert_agelessd() {
         rm -f /etc/systemd/system/agelessd.service
         rm -f /etc/systemd/system/agelessd.timer
         systemctl daemon-reload 2>/dev/null || true
-        echo -e "  [${GREEN}✓${NC}] Removed agelessd service and timer"
+        echo -e "  [${GREEN}✓${NC}] ${I18N_40_REMOVED_AGELESSD_SERVICE}"
     fi
 }
 
@@ -167,8 +179,8 @@ summary_agelessd() {
     fi
 
     echo ""
-    echo -e "  Persistent daemon (agelessd):"
-    echo -e "    /etc/ageless/agelessd .......... Neutralization script"
-    echo -e "    agelessd.service ............... systemd oneshot service"
-    echo -e "    agelessd.timer ................. 24-hour enforcement cycle"
+    echo -e "  ${I18N_40_SUMMARY_BLURB}:"
+    echo -e "    /etc/ageless/agelessd .......... ${I18N_40_SUMMARY_FILEDESC1}"
+    echo -e "    agelessd.service ............... ${I18N_40_SUMMARY_FILEDESC2}"
+    echo -e "    agelessd.timer ................. ${I18N_40_SUMMARY_FILEDESC3}"
 }
