@@ -92,6 +92,24 @@ Three viable shapes. Card #133 has already declared "static site with serverless
 
 **Recommendation (subject to author):** **Option B**. The project values legibility over scale; one Python service that imports the existing modules directly is the smallest and most honest implementation. Option A becomes attractive only if traffic exceeds what a $5–10 VPS can handle, at which point the migration is cheap (the Worker would proxy to the same `fax.py`).
 
+**On AC #6 (serverless-compatible storage) and card #133 (static + serverless backend).** This recommendation contradicts AC #6's "serverless-compatible: DynamoDB/KV store" parenthetical and the framing in card #133. The argument for relaxing AC #6 specifically — not the rhetorical principles, which Option B fully respects — is below; the author should accept this argument explicitly or flip the recommendation to A or C before implementation begins.
+
+AC #6 has two halves. The literal requirement is *"verification state stored server-side… not in-memory"* — Option B satisfies this trivially with an on-disk SQLite file. The parenthetical *"serverless-compatible: DynamoDB/KV store"* names a deployment shape, not a property of the verification system. The deployment shape was a means to an operational end (low idle cost, no patching, platform-handled DDoS) — none of which is a § 1 rhetorical principle.
+
+The case for relaxing the parenthetical:
+
+1. **Legibility outranks ops convenience.** Principle § 1.3 promises "every field… on the form, with the retention period printed beside it" and § 9 publishes the retention cron schedule. A reader auditing the project can read every line of the verification stack inside `agelesslinux/` if it is one Python service. With a Worker + D1 + a Python send-worker, the auditable surface fragments across two runtimes, two deploy targets, and a vendor's edge.
+2. **The data minimisation in § 2 already shrinks the storage problem to where SQLite is sufficient.** Street addresses are discarded; only a district key persists; ledger rows are deleted (not anonymised) at 30 days. The expected steady-state row count is small enough that "serverless-scale" is not a real constraint.
+3. **The transparency surfaces in § 9 require server-rendered HTML with live ledger queries.** Every architecture can do this, but it is most direct from the same Python process that writes the ledger.
+4. **Cost parity.** A $5–10/month VPS is not meaningfully more expensive than the metered floor of D1 + Workers + email-via-Worker for a project at this volume.
+
+The case against (and for flipping to A or C):
+
+1. AC #6 was written for a reason — likely the author wanted no SSH-in-and-tail-the-logs surface, no host to patch, no DNS to manage. If those concerns dominate, Option A is the right call and the recommendation should flip.
+2. Card #133 is a sibling card the author already wrote; a design that contradicts an adjacent card is creating coordination cost the author may not want to pay.
+
+**Action required from the author before implementation:** either (a) accept this argument as the relaxation of AC #6 and proceed with B, or (b) reject it and flip the recommendation to A (single-runtime serverless) or C (hybrid). Either choice is consistent with the rhetorical principles in § 1; the choice is purely operational. This decision is item 1 in § 10.
+
 ## 5. Email verification — magic link
 
 - 32-byte random token, hex-encoded, single use, 30 min TTL.
@@ -110,6 +128,8 @@ Three viable shapes. Card #133 has already declared "static site with serverless
 > {link}
 >
 > We verified that this address resolves to a district. We did not verify your age. We will never verify your age. We retain this email for 30 days for the rate-limit clock; after that, the row is deleted, not anonymised.
+>
+> No age verification required to send a fax.
 
 ## 6. Address self-certification
 
@@ -117,7 +137,7 @@ The Census geocoder (already wired in `lookup.py`) returns one or more matches. 
 
 1. User types an address.
 2. Server geocodes; if exactly one match → use it; if multiple → show the user the matches and ask them to pick one; if none → show error with link to a manual rep-picker fallback.
-3. Server displays the geocoded address back to the user with a checkbox: *"I attest that I live at the address above and am eligible to communicate with the legislators for this district."*
+3. Server displays the geocoded address back to the user with a checkbox: *"I certify I live in this district"* — followed by the geocoded district key (state + district number) and the address as resolved. The longer-form text appears underneath in smaller type: *"I attest that I live at the address above and am eligible to communicate with the legislators for this district."* The short headline is the legally-operative claim; the longer-form text is the spelled-out attestation.
 4. The checkbox is required to proceed. The attestation text is logged with `email_verified_at` (one timestamp; the attestation is by reference, the literal text is in the public design doc, not duplicated per-row).
 
 The full street address is **not** persisted past geocode; only the district identifiers are kept (see § 2). This is the single most important data-minimisation choice in the design.
@@ -127,9 +147,27 @@ The full street address is **not** persisted past geocode; only the district ide
 - Ledger table: `sent(email_hash, rep_id, week_iso, fax_id, sent_at)`.
 - `email_hash = sha256(lowercase(email) + server_secret)`. Pepper prevents rainbow-table re-identification of the ledger if it is ever leaked.
 - `week_iso = ISO 8601 week, US/Pacific` (Monday-anchored). Pacific because the primary target is California.
-- Pre-send check: `SELECT 1 FROM sent WHERE email_hash=? AND rep_id=? AND week_iso=?` → if hit, block with a message that names the legislator, the previous `fax_id`, and the date the clock resets.
+- Pre-send check: `SELECT 1 FROM sent WHERE email_hash=? AND rep_id=? AND week_iso=?` → if hit, block with the response shape below.
 - Post-send write: row inserted in the same transaction as the Telnyx call's success acknowledgement.
 - **No exception path.** Not even for the BDFL. The transparency page documents this.
+
+**Block response shape** (HTTP 429, JSON body, also rendered into the HTML page):
+
+```json
+{
+  "blocked": true,
+  "reason": "weekly_rate_limit",
+  "legislator_name": "Sen. Example",
+  "rep_id": "S000148",
+  "previous_fax_id": "1234abcd-...-...",
+  "previous_sent_at": "2026-04-15T17:42:11-07:00",
+  "resets_at": "2026-04-21T00:00:00-07:00",
+  "rule_url": "https://agelesslinux.org/rate-limit",
+  "tagline": "No age verification required to send a fax."
+}
+```
+
+The `tagline` field is mandatory in every block response. The HTML rendering of the block page surfaces the tagline as a visible byline beneath the legislator name — it is not optional UI copy, it is the rhetorical payload of the rate-limit response. The same tagline appears at the top of the `/rate-limit` transparency page (see § 9).
 
 ## 8. IP + email pattern tracking (anti-abuse)
 
@@ -153,7 +191,7 @@ These pages must ship with the backend, not as a follow-up:
 
 - `/verification` — the rhetorical statement, the data table from § 2, the retention cron schedule, links to `fax.py` and `lookup.py`.
 - `/ledger` — public, append-only, no PII. Columns: `week`, `state`, `district`, `rep_name`, `count`, `last_fax_id`. Useful for journalists and for the senders themselves to see they are not alone.
-- `/rate-limit` — explains the one-per-rep-per-week rule and why.
+- `/rate-limit` — explains the one-per-rep-per-week rule and why. Page opens with the byline **"No age verification required to send a fax."** (the same tagline emitted in every block response — see § 7), followed by the rule statement, the reset clock semantics, and a link to the public ledger row that proves the prior send.
 - `/refused-fields` — the list of things we will not collect, with the AB 1043 § 1798.500–504 citations that would require them.
 
 ## 10. Open decisions for the author
