@@ -2,7 +2,7 @@
 # §§ HEADER — become-ageless.sh setup and utilities
 # ============================================================================
 #  become-ageless.sh — Ageless Linux Distribution Conversion Tool
-#  Version 0.1.0
+#  Version 0.1.1
 #
 #  This script converts your existing Linux installation into
 #  Ageless Linux, a California-regulated operating system.
@@ -30,7 +30,7 @@ CYAN='\033[0;36m'
 BOLD='\033[1m'
 NC='\033[0m'
 
-AGELESS_VERSION="0.1.0"
+AGELESS_VERSION="0.1.1"
 AGELESS_CODENAME="Timeless"
 CONF_PATH="/etc/agelesslinux.conf"
 

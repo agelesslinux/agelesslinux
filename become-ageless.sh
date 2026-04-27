@@ -2,7 +2,7 @@
 # §§ HEADER — become-ageless.sh setup and utilities
 # ============================================================================
 #  become-ageless.sh — Ageless Linux Distribution Conversion Tool
-#  Version 0.1.0
+#  Version 0.1.1
 #
 #  This script converts your existing Linux installation into
 #  Ageless Linux, a California-regulated operating system.
@@ -30,7 +30,7 @@ CYAN='\033[0;36m'
 BOLD='\033[1m'
 NC='\033[0m'
 
-AGELESS_VERSION="0.1.0"
+AGELESS_VERSION="0.1.1"
 AGELESS_CODENAME="Timeless"
 CONF_PATH="/etc/agelesslinux.conf"
 
@@ -133,9 +133,9 @@ PRETTY_NAME="Ageless Linux ${AGELESS_VERSION} (${BASE_NAME}${BASE_VERSION:+ $BAS
 NAME="Ageless Linux"
 VERSION_ID="${AGELESS_VERSION}"
 VERSION="${AGELESS_VERSION} (${AGELESS_CODENAME})"
-VERSION_CODENAME=${AGELESS_CODENAME,,}
+VERSION_CODENAME="${AGELESS_CODENAME,,}"
 ID=ageless
-ID_LIKE=${AGELESS_ID_LIKE}
+ID_LIKE="${AGELESS_ID_LIKE}"
 HOME_URL="https://agelesslinux.org"
 SUPPORT_URL="https://agelesslinux.org"
 BUG_REPORT_URL="https://agelesslinux.org"
@@ -158,8 +158,8 @@ EOF
         fi
         cat > /etc/lsb-release << EOF
 DISTRIB_ID=Ageless
-DISTRIB_RELEASE=${AGELESS_VERSION}
-DISTRIB_CODENAME=${AGELESS_CODENAME,,}
+DISTRIB_RELEASE="${AGELESS_VERSION}"
+DISTRIB_CODENAME="${AGELESS_CODENAME,,}"
 DISTRIB_DESCRIPTION="Ageless Linux ${AGELESS_VERSION} (${AGELESS_CODENAME})"
 EOF
         echo -e "  [${GREEN}✓${NC}] Updated /etc/lsb-release"
