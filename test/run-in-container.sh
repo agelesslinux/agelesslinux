@@ -84,8 +84,8 @@ echo "  Human users: ${HUMAN_USERS:-none}"
 section "--version"
 
 version_out=$(bash "$SCRIPT" --version 2>&1)
-if [[ "$version_out" == *"0.1.0"* ]]; then
-    pass "--version prints 0.1.0"
+if [[ "$version_out" == *"0.1.1"* ]]; then
+    pass "--version prints 0.1.1"
 else
     fail "--version" "got: $version_out"
 fi
@@ -273,8 +273,8 @@ if [[ -f /etc/agelesslinux.conf ]]; then
     # Verify key fields
     # shellcheck disable=SC1091
     source /etc/agelesslinux.conf
-    if [[ "${AGELESS_VERSION:-}" == "0.1.0" ]]; then
-        pass "conf records version 0.1.0"
+    if [[ "${AGELESS_VERSION:-}" == "0.1.1" ]]; then
+        pass "conf records version 0.1.1"
     else
         fail "conf version" "got: ${AGELESS_VERSION:-unset}"
     fi
@@ -391,6 +391,98 @@ if [[ $HAS_SYSTEMCTL -eq 0 ]]; then
 else
     skip "--persistent error test" "systemctl is available"
 fi
+
+# ── Test: revert skips userdbd reload when DM is active ──────────────────────
+#
+# Regression test for issue #1: reloading systemd-userdbd mid-session breaks
+# the SDDM (and LightDM) lock screen. The fix in revert_userdb must detect
+# an active display manager and skip the reload, warning the user instead.
+
+section "revert: DM lock-screen safety (issue #1 fix)"
+
+bash "$SCRIPT" --accept >/dev/null 2>&1
+
+mkdir -p /tmp/mock-bin
+RELOAD_FLAG=/tmp/mock-bin/userdbd-reload-called
+rm -f "$RELOAD_FLAG"
+
+cat > /tmp/mock-bin/systemctl << 'MOCK_EOF'
+#!/bin/bash
+# Mock: sddm is active, userdbd is installed. Reloading userdbd must not happen.
+case "${1:-} ${2:-}" in
+    "is-active sddm.service")                         exit 0 ;;
+    "is-active "*.service)                             exit 1 ;;
+    "list-unit-files systemd-userdbd.service")         exit 0 ;;
+    "try-reload-or-restart systemd-userdbd.service")
+        touch /tmp/mock-bin/userdbd-reload-called ; exit 0 ;;
+    *) exit 0 ;;
+esac
+MOCK_EOF
+chmod +x /tmp/mock-bin/systemctl
+
+dm_revert_out=$(PATH="/tmp/mock-bin:$PATH" bash "$SCRIPT" --revert 2>&1)
+
+if echo "$dm_revert_out" | grep -q "Skipped userdbd reload"; then
+    pass "revert: skips userdbd reload when SDDM is active"
+else
+    fail "revert DM reload check" "expected 'Skipped userdbd reload'; got: $(echo "$dm_revert_out" | grep -i 'userdbd\|reload\|sddm' | head -3)"
+fi
+
+if echo "$dm_revert_out" | grep -qi "log out\|lock"; then
+    pass "revert: warns about lock screen when DM active"
+else
+    fail "revert DM warning" "no lock-screen warning in output"
+fi
+
+if [[ ! -f "$RELOAD_FLAG" ]]; then
+    pass "revert: userdbd was NOT reloaded (lock screen protected)"
+else
+    fail "revert DM safety" "userdbd try-reload-or-restart was called despite active SDDM"
+fi
+
+rm -rf /tmp/mock-bin
+
+# ── Test: revert_no_conf prints per-file userdb instructions ─────────────────
+#
+# Regression test for issue #1 (legacy path): the old revert_no_conf printed
+# "rm -rf /etc/userdb" which destroyed any pre-existing userdb records that
+# ageless had backed up before modifying. The fix prints per-file instructions:
+#   - "mv backup → original" when a .pre-ageless backup exists
+#   - "rm -f file"           when no backup exists (ageless created it fresh)
+
+section "revert_no_conf: per-file userdb instructions (not rm -rf)"
+
+cp /etc/os-release /etc/os-release.pre-ageless
+mkdir -p /etc/userdb
+printf '{"userName":"testuser","uid":1000,"birthDate":"1970-01-01"}\n' \
+    > /etc/userdb/testuser.user
+printf '{"userName":"testuser","uid":1000,"birthDate":null}\n' \
+    > /etc/userdb/testuser.user.pre-ageless
+printf '{"userName":"orphan","uid":1001,"birthDate":"1970-01-01"}\n' \
+    > /etc/userdb/orphan.user
+
+no_conf_out=$(bash "$SCRIPT" --revert 2>&1 || true)
+
+if echo "$no_conf_out" | grep -q "mv.*testuser\.user\.pre-ageless.*testuser\.user"; then
+    pass "revert_no_conf: prints 'mv backup → original' for backed-up user"
+else
+    fail "revert_no_conf mv" "no mv instruction for testuser.user.pre-ageless"
+fi
+
+if echo "$no_conf_out" | grep -q "rm -f.*orphan\.user"; then
+    pass "revert_no_conf: prints 'rm -f' for un-backed-up user"
+else
+    fail "revert_no_conf rm" "no rm -f instruction for orphan.user"
+fi
+
+if echo "$no_conf_out" | grep -q "rm -rf /etc/userdb"; then
+    fail "revert_no_conf safety" "still prints 'rm -rf /etc/userdb' (too broad)"
+else
+    pass "revert_no_conf: does NOT print 'rm -rf /etc/userdb'"
+fi
+
+rm -f /etc/os-release.pre-ageless
+rm -rf /etc/userdb
 
 # ── Results ──────────────────────────────────────────────────────────────────
 

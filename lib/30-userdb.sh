@@ -262,11 +262,25 @@ revert_userdb() {
         fi
     fi
 
-    # Restart userdbd to clear any cached records (safe during revert)
+    # Restart userdbd to clear cached records — but NOT if a display manager
+    # is active: reloading userdbd mid-session breaks the lock screen (same
+    # bug that affected the install path).
     if command -v systemctl &>/dev/null; then
         if systemctl list-unit-files systemd-userdbd.service &>/dev/null 2>&1; then
-            systemctl try-reload-or-restart systemd-userdbd.service 2>/dev/null || true
-            echo -e "  [${GREEN}✓${NC}] Reloaded systemd-userdbd"
+            local active_dm=""
+            for dm in sddm gdm gdm3 lightdm lxdm nodm; do
+                if systemctl is-active "${dm}.service" &>/dev/null; then
+                    active_dm="$dm"
+                    break
+                fi
+            done
+            if [[ -n "$active_dm" ]]; then
+                echo -e "  [${YELLOW}!${NC}] Skipped userdbd reload — ${active_dm} is active."
+                echo -e "  ${YELLOW}       Do NOT lock your screen. Log out and back in (or reboot).${NC}"
+            else
+                systemctl try-reload-or-restart systemd-userdbd.service 2>/dev/null || true
+                echo -e "  [${GREEN}✓${NC}] Reloaded systemd-userdbd"
+            fi
         fi
     fi
 }

@@ -629,11 +629,25 @@ revert_userdb() {
         fi
     fi
 
-    # Restart userdbd to clear any cached records (safe during revert)
+    # Restart userdbd to clear cached records — but NOT if a display manager
+    # is active: reloading userdbd mid-session breaks the lock screen (same
+    # bug that affected the install path).
     if command -v systemctl &>/dev/null; then
         if systemctl list-unit-files systemd-userdbd.service &>/dev/null 2>&1; then
-            systemctl try-reload-or-restart systemd-userdbd.service 2>/dev/null || true
-            echo -e "  [${GREEN}✓${NC}] Reloaded systemd-userdbd"
+            local active_dm=""
+            for dm in sddm gdm gdm3 lightdm lxdm nodm; do
+                if systemctl is-active "${dm}.service" &>/dev/null; then
+                    active_dm="$dm"
+                    break
+                fi
+            done
+            if [[ -n "$active_dm" ]]; then
+                echo -e "  [${YELLOW}!${NC}] Skipped userdbd reload — ${active_dm} is active."
+                echo -e "  ${YELLOW}       Do NOT lock your screen. Log out and back in (or reboot).${NC}"
+            else
+                systemctl try-reload-or-restart systemd-userdbd.service 2>/dev/null || true
+                echo -e "  [${GREEN}✓${NC}] Reloaded systemd-userdbd"
+            fi
         fi
     fi
 }
@@ -1279,7 +1293,21 @@ revert_no_conf() {
         fi
         echo "    sudo rm -rf /etc/ageless"
         if [[ -d /etc/userdb ]]; then
-            echo "    sudo rm -rf /etc/userdb"
+            # Restore per-user backups where they exist; only remove files without one.
+            # rm -rf /etc/userdb would destroy any pre-existing userdb records.
+            local has_userdb_files=0
+            for f in /etc/userdb/*.user; do
+                [[ -f "$f" ]] || continue
+                has_userdb_files=1
+                if [[ -f "${f}.pre-ageless" ]]; then
+                    echo "    sudo mv ${f}.pre-ageless ${f}"
+                else
+                    echo "    sudo rm -f ${f}"
+                fi
+            done
+            if [[ $has_userdb_files -eq 0 ]]; then
+                echo "    sudo rmdir /etc/userdb 2>/dev/null || true"
+            fi
         fi
         if command -v systemctl &>/dev/null; then
             if systemctl list-unit-files agelessd.timer &>/dev/null 2>&1; then
