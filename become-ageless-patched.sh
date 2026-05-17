@@ -917,7 +917,7 @@ execute_apt_hook() {
 //
 // Safe to leave in place: the test is a no-op when branding is already correct.
 DPkg::Post-Invoke {
-    "if [ -f /etc/ageless/os-release.ageless ] && ! grep -q 'NAME=\"Ageless Linux\"' /etc/os-release 2>/dev/null; then cp /etc/ageless/os-release.ageless /etc/os-release && echo 'ageless: restored os-release branding after package upgrade.'; fi || true";
+    "if [ -f /etc/ageless/os-release.ageless ] && ! grep -q NAME=Ageless /etc/os-release 2>/dev/null; then cp /etc/ageless/os-release.ageless /etc/os-release && echo 'ageless: restored os-release branding after package upgrade.'; fi || true";
 };
 EOF
     echo -e "  [${GREEN}✓${NC}] Installed /etc/apt/apt.conf.d/99ageless-branding"
