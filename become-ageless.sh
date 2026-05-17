@@ -48,6 +48,7 @@ CONF_USERDB_DIR_CREATED=0
 CONF_USERDB_CREATED=""
 CONF_USERDB_BACKED_UP=""
 CONF_AGELESSD_INSTALLED=0
+CONF_APT_HOOK_INSTALLED=0
 
 # ── Analysis defaults (set by analyze_* functions) ──────────────────────────
 HAS_SYSTEMD=0
@@ -58,6 +59,8 @@ USERDB_DIR_EXISTS=0
 USERDB_AVAILABLE=0
 USERDB_BIRTHDATE_FOUND=0
 PREVIOUS_INSTALL=0
+OS_RELEASE_IS_SYMLINK=0
+APT_HOOK_NEEDED=0
 
 # ── Utility functions ────────────────────────────────────────────────────────
 
@@ -88,6 +91,24 @@ analyze_os_release() {
     # e.g. Ubuntu (ID=ubuntu, ID_LIKE=debian) → "ubuntu debian"
     # e.g. Arch   (ID=arch, no ID_LIKE)       → "arch"
     AGELESS_ID_LIKE="${BASE_ID}${BASE_ID_LIKE:+ $BASE_ID_LIKE}"
+
+    # Detect whether /etc/os-release is a symlink.
+    # On Debian (and Arch, Fedora, etc.), it is a symlink → ../usr/lib/os-release.
+    # On Ubuntu, /etc/os-release is a real conffile; dpkg preserves modifications.
+    OS_RELEASE_IS_SYMLINK=0
+    if [[ -L /etc/os-release ]]; then
+        OS_RELEASE_IS_SYMLINK=1
+    fi
+
+    # Only install an apt hook when BOTH conditions are true:
+    #   1. /etc/os-release is a symlink (branding at risk from package upgrades)
+    #   2. apt is the package manager (/etc/apt/apt.conf.d/ exists)
+    # Arch, Fedora, and other non-apt distros also symlink /etc/os-release, but
+    # they have no apt hook infrastructure — writing there would be wrong.
+    APT_HOOK_NEEDED=0
+    if [[ $OS_RELEASE_IS_SYMLINK -eq 1 ]] && [[ -d /etc/apt/apt.conf.d ]]; then
+        APT_HOOK_NEEDED=1
+    fi
 }
 
 plan_os_release() {
@@ -843,6 +864,92 @@ summary_agelessd() {
     echo -e "    agelessd.timer ................. 24-hour enforcement cycle"
 }
 
+# §§ APT-HOOK — Debian apt post-invoke hook for os-release branding persistence
+#
+#    On Debian, /etc/os-release is a symlink → ../usr/lib/os-release.
+#    The base-files package owns /usr/lib/os-release and replaces it on upgrade
+#    without dpkg conffile protection, silently wiping the Ageless branding.
+#
+#    On Ubuntu (and other distros where /etc/os-release is a real file), dpkg
+#    treats it as a conffile and preserves local modifications — so the branding
+#    survives upgrades without any extra mechanism.
+#
+#    The fix: when /etc/os-release is detected as a symlink, save a copy of the
+#    Ageless os-release content to /etc/ageless/os-release.ageless and install
+#    an apt DPkg::Post-Invoke hook that restores it whenever base-files (or any
+#    other package) resets it.
+
+plan_apt_hook() {
+    if [[ $APT_HOOK_NEEDED -eq 0 ]]; then
+        return
+    fi
+    plan_action "Save Ageless os-release to /etc/ageless/os-release.ageless (branding cache)"
+    plan_action "Install /etc/apt/apt.conf.d/99ageless-branding (apt post-invoke hook)"
+}
+
+execute_apt_hook() {
+    if [[ $APT_HOOK_NEEDED -eq 0 ]]; then
+        return
+    fi
+
+    echo ""
+    echo -e "  ${BOLD}Installing apt post-invoke hook (Debian: /etc/os-release is a symlink)...${NC}"
+    echo ""
+    echo "  /etc/os-release → $(readlink /etc/os-release)"
+    echo "  base-files upgrades replace the target directly, bypassing dpkg"
+    echo "  conffile protection. Installing a post-invoke hook to restore"
+    echo "  Ageless branding whenever it is overwritten."
+    echo ""
+
+    mkdir -p /etc/ageless
+
+    # Cache the Ageless os-release so the hook can restore from it without
+    # needing to re-derive the content.
+    cp /etc/os-release /etc/ageless/os-release.ageless
+    echo -e "  [${GREEN}✓${NC}] Saved branding cache → /etc/ageless/os-release.ageless"
+
+    cat > /etc/apt/apt.conf.d/99ageless-branding << 'EOF'
+// Ageless Linux — os-release branding persistence hook
+//
+// On Debian, /etc/os-release is a symlink to /usr/lib/os-release, which is
+// NOT a dpkg conffile. Upgrades to base-files silently replace it, wiping the
+// Ageless Linux branding. This hook detects that and restores the cached copy.
+//
+// Safe to leave in place: the test is a no-op when branding is already correct.
+DPkg::Post-Invoke {
+    "if [ -f /etc/ageless/os-release.ageless ] && \
+        ! grep -q 'NAME=\"Ageless Linux\"' /etc/os-release 2>/dev/null; then \
+        cp /etc/ageless/os-release.ageless /etc/os-release && \
+        echo 'ageless: restored os-release branding after package upgrade.'; \
+     fi || true";
+};
+EOF
+    echo -e "  [${GREEN}✓${NC}] Installed /etc/apt/apt.conf.d/99ageless-branding"
+    CONF_APT_HOOK_INSTALLED=1
+}
+
+revert_apt_hook() {
+    # Remove the hook unconditionally if either the conf tracked it OR the file
+    # already exists (covers upgrades from versions that didn't track this flag).
+    if [[ "${AGELESS_APT_HOOK_INSTALLED:-0}" == "1" ]] || \
+       [[ -f /etc/apt/apt.conf.d/99ageless-branding ]]; then
+        rm -f /etc/apt/apt.conf.d/99ageless-branding
+        rm -f /etc/ageless/os-release.ageless
+        echo -e "  [${GREEN}✓${NC}] Removed apt hook (/etc/apt/apt.conf.d/99ageless-branding)"
+        echo -e "  [${GREEN}✓${NC}] Removed branding cache (/etc/ageless/os-release.ageless)"
+    fi
+}
+
+summary_apt_hook() {
+    if [[ $APT_HOOK_NEEDED -eq 0 ]]; then
+        return
+    fi
+    echo ""
+    echo -e "  apt post-invoke hook (Debian symlink fix):"
+    echo -e "    /etc/ageless/os-release.ageless ............. Ageless branding cache"
+    echo -e "    /etc/apt/apt.conf.d/99ageless-branding ...... apt post-invoke hook"
+}
+
 # §§ CONF — /etc/agelesslinux.conf installation record
 
 plan_conf() {
@@ -871,6 +978,7 @@ AGELESS_USERDB_DIR_CREATED=${CONF_USERDB_DIR_CREATED}
 AGELESS_USERDB_CREATED="${CONF_USERDB_CREATED}"
 AGELESS_USERDB_BACKED_UP="${CONF_USERDB_BACKED_UP}"
 AGELESS_AGELESSD_INSTALLED=${CONF_AGELESSD_INSTALLED}
+AGELESS_APT_HOOK_INSTALLED=${CONF_APT_HOOK_INSTALLED}
 EOF
 
     echo ""
@@ -994,6 +1102,13 @@ print_analysis() {
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo ""
     echo -e "  Base system:              ${CYAN}${BASE_NAME}${BASE_VERSION:+ $BASE_VERSION}${NC} (${BASE_ID})"
+    if [[ $APT_HOOK_NEEDED -eq 1 ]]; then
+        echo -e "  /etc/os-release:          ${YELLOW}symlink → apt hook will be installed${NC}"
+    elif [[ $OS_RELEASE_IS_SYMLINK -eq 1 ]]; then
+        echo -e "  /etc/os-release:          symlink (no apt; hook not applicable)"
+    else
+        echo -e "  /etc/os-release:          real file (conffile-safe)"
+    fi
 
     # Display manager
     if [[ "$DM_NAME" != "unknown" ]]; then
@@ -1083,6 +1198,7 @@ print_planned_actions() {
     ACTION_NUM=1
 
     plan_os_release
+    plan_apt_hook
     plan_compliance
     plan_userdb
     plan_agelessd
@@ -1182,6 +1298,7 @@ execute_all() {
     echo ""
 
     execute_os_release
+    execute_apt_hook
     execute_compliance
     execute_userdb
     execute_agelessd
@@ -1214,6 +1331,7 @@ print_summary() {
         echo ""
         echo -e "  Files created:"
         summary_os_release
+        summary_apt_hook
         summary_compliance
         summary_userdb
         summary_agelessd
@@ -1249,6 +1367,7 @@ print_summary() {
         echo ""
         echo -e "  Files created:"
         summary_os_release
+        summary_apt_hook
         summary_compliance
         summary_userdb
         summary_agelessd
@@ -1291,6 +1410,7 @@ revert_no_conf() {
             echo "    sudo cp /etc/lsb-release.pre-ageless /etc/lsb-release"
             echo "    sudo rm -f /etc/lsb-release.pre-ageless"
         fi
+        echo "    sudo rm -f /etc/apt/apt.conf.d/99ageless-branding"
         echo "    sudo rm -rf /etc/ageless"
         if [[ -d /etc/userdb ]]; then
             # Restore per-user backups where they exist; only remove files without one.
@@ -1358,6 +1478,7 @@ revert_all() {
     echo ""
 
     revert_os_release
+    revert_apt_hook
     revert_agelessd
     revert_userdb
     revert_compliance
