@@ -100,13 +100,6 @@ jobs:
           [[ "${{ inputs.flagrant }}" == true ]] && args+=(--flagrant)
           ./build.py "${args[@]}"
           ls -lh out/
-      - name: Smoke test in QEMU
-        run: |
-          iso=$(ls out/*.iso | head -n1)
-          kvm=(); [ -e /dev/kvm ] && kvm=(--device /dev/kvm)
-          docker run --rm "${kvm[@]}" -v "$PWD:/src:ro" -v "$PWD/out:/out" localhost/ageless-build:trixie \
-            python3 /src/tests/smoke.py "/out/$(basename "$iso")" --arch ${{ matrix.arch }} \
-              --timeout 900 --artifacts /out/smoke
       - name: Check release-asset size limit (2 GiB)
         run: |
           for iso in out/*.iso; do
@@ -114,6 +107,13 @@ jobs:
             echo "$iso: $((size / 1048576)) MiB"
             [ "$size" -lt 2147483648 ] || { echo "::error::$iso exceeds GitHub's 2 GiB release asset limit"; exit 1; }
           done
+      - name: Smoke test in QEMU
+        run: |
+          iso=$(ls out/*.iso | head -n1)
+          kvm=(); [ -e /dev/kvm ] && kvm=(--device /dev/kvm)
+          docker run --rm "${kvm[@]}" -v "$PWD:/src:ro" -v "$PWD/out:/out" localhost/ageless-build:trixie \
+            python3 /src/tests/smoke.py "/out/$(basename "$iso")" --arch ${{ matrix.arch }} \
+              --timeout 900 --artifacts /out/smoke
       - uses: actions/upload-artifact@v4
         if: always()
         with:

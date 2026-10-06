@@ -74,7 +74,9 @@ QEMU smoke test, and creates a draft release on `v*` tags.
   works around this and fails loudly once upstream fixes it.
 - **arm64** builds in CI but is experimental. Debian itself publishes no
   arm64 live images.
-- The boot menus (GRUB/isolinux) still use live-build's default look.
+- The live ISO's boot menu carries the Ageless splash. The **d-i image's** boot
+  menu and installer screens are still stock Debian; that is the roadmap's
+  Phase 2 `ageless-installer-theme` (rootskel-gtk + debian-cd splash) work.
 - `/etc/issue` still says Debian, until we fork base-files.
 
 See [docs/ROADMAP.md](docs/ROADMAP.md) for the plan and

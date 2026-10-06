@@ -62,7 +62,9 @@ def qemu_base(arch: str, memory: int) -> list[str]:
     else:
         cmd = ["qemu-system-aarch64", "-machine", "virt" + (",accel=kvm" if kvm else ",accel=tcg")]
         cmd += ["-cpu", "host" if kvm else "cortex-a72"]
-    cmd += ["-m", str(memory), "-smp", "2", "-nic", "user,model=virtio-net-pci"]
+    # romfile= : no PXE option ROM needed (and ipxe-qemu isn't installed).
+    cmd += ["-m", str(memory), "-smp", "2",
+            "-netdev", "user,id=net0", "-device", "virtio-net-pci,netdev=net0,romfile="]
     if not kvm:
         print("note: /dev/kvm unavailable, using TCG emulation (slow)", flush=True)
     return cmd
@@ -159,6 +161,9 @@ def serial_check(iso: Path, arch: str, timeout: int, artifacts: Path, netinst: b
             proc.kill()
             proc.wait()
     ok = len(found) == len(markers)
+    if not ok and proc.returncode not in (None, -9):
+        tail = (artifacts / "serial.log").read_text(errors="replace")[-800:]
+        print(f"   QEMU exited with status {proc.returncode}:\n{tail}", flush=True)
     print(f"   {'PASS' if ok else 'FAIL'}: {len(found)}/{len(markers)} markers "
           f"(log: {artifacts / 'serial.log'})", flush=True)
     return ok
