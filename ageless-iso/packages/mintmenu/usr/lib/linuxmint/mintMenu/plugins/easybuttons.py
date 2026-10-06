@@ -2,6 +2,7 @@
 
 import os.path
 import shutil
+import subprocess
 import unidecode
 
 import xdg.DesktopEntry
@@ -380,7 +381,12 @@ class ApplicationLauncher(easyButton):
                 Execute(None, desktopFile=self.desktopFile, offload=offload)
 
     def uninstall(self, *args):
-        Execute("mint-remove-application " + self.desktopFile)
+        # Ageless: mint-remove-application is Mint-only; fall back to our apt helper.
+        if os.path.exists("/usr/bin/mint-remove-application"):
+            Execute("mint-remove-application " + self.desktopFile)
+        else:
+            subprocess.Popen(["/usr/lib/linuxmint/mintMenu/apt-helper.py",
+                              "remove-desktop-file", self.desktopFile])
 
     # IconTheme changed, setup new icons for button and drag 'n drop
     def iconChanged(self):

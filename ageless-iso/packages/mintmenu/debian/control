@@ -1,9 +1,12 @@
 Source: mintmenu
 Section: admin
 Priority: optional
-Maintainer: Clement Lefebvre <root@linuxmint.com>
+Maintainer: Ageless Linux <archive@agelesslinux.org>
+XSBC-Original-Maintainer: Clement Lefebvre <root@linuxmint.com>
 Build-Depends: debhelper (>= 9), python3, dh-python,
 Standards-Version: 3.9.5
+Homepage: https://github.com/linuxmint/mintmenu
+Vcs-Browser: https://github.com/agelesslinux/agelesslinux/tree/main/ageless-iso/packages/mintmenu
 
 Package: mintmenu
 Architecture: all
@@ -27,6 +30,11 @@ Depends:
  gir1.2-gtk-3.0,
  gir1.2-matedesktop-2.0,
  gir1.2-xapp-1.0
+Recommends: pkexec
 Description: Advanced MATE menu
  One of the most advanced menus under Linux. MintMenu supports filtering,
  favorites, easy-uninstallation, autosession, and many other features.
+ .
+ This is the Ageless Linux fork: uninstalling and installing work on plain
+ Debian (no mintcommon or mintinstall needed), software search goes to
+ packages.debian.org, and the default favorites suit Ageless Linux.

@@ -27,6 +27,20 @@ locale.textdomain("mintmenu")
 
 home = os.path.expanduser("~")
 
+
+def _debian_suite():
+    """Ageless: DEBIAN_CODENAME (LMDE convention) or VERSION_CODENAME from os-release."""
+    fields = {}
+    try:
+        with open("/etc/os-release") as f:
+            for line in f:
+                key, _sep, value = line.strip().partition("=")
+                fields[key] = value.strip('"')
+    except OSError:
+        pass
+    return fields.get("DEBIAN_CODENAME") or fields.get("VERSION_CODENAME") or "stable"
+
+
 class PackageDescriptor():
     def __init__(self, name, summary, description):
         self.name = name
@@ -347,7 +361,11 @@ class pluginclass(object):
                     self.panel_position = object_schema.get_int("position") + 1
 
     def url_install(self, widget, pkg_name):
-        subprocess.Popen(["xdg-open", "apt://%s" % pkg_name])
+        # Ageless: apt:// needs mintinstall or apturl, which Debian lacks.
+        if Gio.AppInfo.get_default_for_uri_scheme("apt"):
+            subprocess.Popen(["xdg-open", "apt://%s" % pkg_name])
+        else:
+            subprocess.Popen(["/usr/lib/linuxmint/mintMenu/apt-helper.py", "install", pkg_name])
         self.mintMenuWin.hide()
 
     @staticmethod
@@ -1007,11 +1025,9 @@ class pluginclass(object):
         add_menu_item('accessories-dictionary', _("Search Dictionary"), self.search_dictionary)
         add_menu_item("xsi-edit-find-symbolic", _("Search Computer"), self.Search)
         add_menu_item()
-        add_menu_item('/usr/lib/linuxmint/mintMenu/search_engines/software.png', _("Find Software"), self.search_mint_software)
-        add_menu_item('/usr/lib/linuxmint/mintMenu/search_engines/tutorials.png', _("Find Tutorials"), self.search_mint_tutorials)
-        add_menu_item('/usr/lib/linuxmint/mintMenu/search_engines/hardware.png', _("Find Hardware"), self.search_mint_hardware)
-        add_menu_item('/usr/lib/linuxmint/mintMenu/search_engines/ideas.png', _("Find Ideas"), self.search_mint_ideas)
-        add_menu_item('/usr/lib/linuxmint/mintMenu/search_engines/users.png', _("Find Users"), self.search_mint_users)
+        # Ageless: the Mint community site searches (tutorials, hardware, ideas,
+        # users) only cover Linux Mint. Search Debian's package archive instead.
+        add_menu_item('/usr/lib/linuxmint/mintMenu/search_engines/software.png', _("Find Software"), self.search_debian_packages)
 
         menu.show_all()
 
@@ -1064,6 +1080,11 @@ class pluginclass(object):
     def search_mint_software(self, widget):
         text = urllib.parse.quote(self.searchEntry.get_text())
         subprocess.Popen(["xdg-open", "https://community.linuxmint.com/index.php/software/search/0/%s" % text])
+        self.mintMenuWin.hide()
+
+    def search_debian_packages(self, widget):
+        text = urllib.parse.quote_plus(self.searchEntry.get_text().strip())
+        subprocess.Popen(["xdg-open", "https://packages.debian.org/search?searchon=all&suite=%s&keywords=%s" % (_debian_suite(), text)])
         self.mintMenuWin.hide()
 
     def add_to_desktop(self, widget, desktopEntry):

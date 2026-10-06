@@ -7,6 +7,9 @@
 #                      a ~ageless version suffix so Debian's next release wins
 #
 # `enabled = false` entries are planned but not yet validated.
+#
+# mintmenu is not here: Ageless Linux forks it, in packages/mintmenu (a git
+# subtree of linuxmint/mintmenu; see docs/mintmenu.md).
 
 [[package]]
 name = "mint-x-icons"
@@ -21,16 +24,6 @@ kind = "git"
 url = "https://github.com/linuxmint/mint-themes.git"
 ref = "2.4.2"
 why = "Mint-Y GTK theme; Debian ships only mint-y-icons"
-
-[[package]]
-name = "mintmenu"
-kind = "git"
-url = "https://github.com/linuxmint/mintmenu.git"
-# Mint stopped tagging mintmenu at 5.9.0 (Python 2). 6.2.3 lives on master;
-# pin the commit so builds are repeatable.
-ref = "master"
-commit = "b0ff4eb20c1e670d93a966e3d80d4374f25f0a1b"
-why = "Mint's MATE menu; replaces mate-menu in the ageless panel layout"
 
 [[package]]
 name = "slick-greeter"
