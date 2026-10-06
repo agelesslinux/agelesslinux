@@ -3,5 +3,7 @@ calamares-settings-ageless (0.1.0) timeless; urgency=medium
   * Fork calamares-settings-debian 13.0.13-1 for Ageless Linux: rename the
     branding, launcher and helpers; MATE live-session overrides; enable the
     Ageless apt archive in sources-final when ageless-keyring is present.
+  * Remove calamares itself after install and autoremove its orphaned
+    KF6/Qt dependencies (new ageless-autoremove job).
 
  -- Ageless Linux <archive@agelesslinux.org>  Tue, 06 Oct 2026 12:00:00 +0000

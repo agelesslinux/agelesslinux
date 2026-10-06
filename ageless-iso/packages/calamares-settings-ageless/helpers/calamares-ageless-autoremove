@@ -1,0 +1,12 @@
+#!/bin/sh
+#
+# Purge what only the live session needed. The packages module removes
+# calamares and the live-* tooling; this drops their now-orphaned
+# dependencies (calamares alone pulls in ~70 KF6/Qt packages).
+#
+
+CHROOT=$(mount | grep proc | grep calamares | awk '{print $3}' | sed -e "s#/proc##g")
+
+DEBIAN_FRONTEND=noninteractive chroot $CHROOT apt-get -y autoremove --purge
+
+exit 0

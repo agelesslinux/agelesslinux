@@ -33,6 +33,10 @@ tmp="$(mktemp "${TARGET}.XXXXXX")"
     echo "AGELESS_AB1043_COMPLIANCE=\"${compliance}\""
     echo "AGELESS_AGE_VERIFICATION_API=\"${api}\""
     echo "AGELESS_AGE_VERIFICATION_STATUS=\"${status}\""
+    # Image builders may record extra KEY=value fields (e.g. BUILD_ID).
+    if [ -f /etc/ageless/os-release.extra ]; then
+        grep -E '^[A-Z_]+=' /etc/ageless/os-release.extra || true
+    fi
 } > "$tmp"
 chmod 0644 "$tmp"
 mv "$tmp" "$TARGET"

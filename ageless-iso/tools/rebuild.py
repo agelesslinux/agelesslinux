@@ -15,6 +15,7 @@ From the host, through build.py's container:
 from __future__ import annotations
 
 import argparse
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -38,7 +39,9 @@ def install_build_deps(srcdir: Path) -> None:
 
 def build_git(entry: dict, work: Path) -> Path:
     srcdir = work / entry["name"]
-    sh(["git", "clone", "--depth", "1", "--branch", entry["ref"], entry["url"], str(srcdir)])
+    sh(["git", "clone", "--depth", "50", "--branch", entry["ref"], entry["url"], str(srcdir)])
+    if "commit" in entry:
+        sh(["git", "checkout", "--quiet", entry["commit"]], cwd=srcdir)
     return srcdir
 
 
@@ -63,7 +66,7 @@ def rebuild(entry: dict, out: Path) -> None:
         sh(["dpkg-buildpackage", "-b", "-us", "-uc"], cwd=srcdir)
         out.mkdir(parents=True, exist_ok=True)
         for deb in srcdir.parent.glob("*.deb"):
-            deb.rename(out / deb.name)
+            shutil.move(deb, out / deb.name)
             print(f"I: {out / deb.name}")
 
 
@@ -72,6 +75,8 @@ def main() -> int:
     p.add_argument("names", nargs="*", help="entries to build (default: all enabled)")
     p.add_argument("--out", type=Path, default=Path("/out/rebuilds"))
     p.add_argument("--list", action="store_true")
+    p.add_argument("--skip-existing", action="store_true",
+                   help="skip entries that already have a <name>_*.deb in --out (build cache)")
     args = p.parse_args()
 
     entries = tomllib.loads(MANIFEST.read_text())["package"]
@@ -86,6 +91,9 @@ def main() -> int:
     if missing:
         return f"not in {MANIFEST.name}: {', '.join(sorted(missing))}"
     for entry in chosen:
+        if args.skip_existing and list(args.out.glob(f"{entry['name']}_*.deb")):
+            print(f"== {entry['name']}: cached in {args.out}, skipping", flush=True)
+            continue
         print(f"== {entry['name']} ({entry['kind']})", flush=True)
         rebuild(entry, args.out)
     return 0

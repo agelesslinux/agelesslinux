@@ -1,14 +1,15 @@
 # Ageless Linux MATE desktop. Our own packages (ageless-*, calamares-settings-
-# ageless) come from config/packages.chroot, which build-inner.sh fills.
+# ageless) and the Mint rebuilds (mintmenu, mint-themes, mint-x-icons) come
+# from config/packages.chroot, which build-inner.sh fills.
 ageless-desktop-mate
 mate-desktop-environment
-mate-menu
+mintmenu
+mint-themes
+mint-y-icons
 mate-tweak
 lightdm
 slick-greeter
 lightdm-settings
-arc-theme
-mint-y-icons
 fonts-noto-core
 fonts-noto-color-emoji
 

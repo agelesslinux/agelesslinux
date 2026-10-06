@@ -80,9 +80,14 @@ def run(cmd: list[str], dry_run: bool) -> None:
         subprocess.run(cmd, check=True)
 
 
-def inner_script(variant: str) -> str:
+def inner_script(variant: str, rebuilds: bool = True) -> str:
     """The shell run inside the container: build packages, then the variant."""
-    steps = ["set -euo pipefail", "tools/build-packages.sh /out/debs"]
+    steps = ["set -euo pipefail"]
+    if rebuilds:
+        # Mint packages Debian lacks (upstream/rebuilds.toml), cached across runs.
+        steps.append("python3 tools/rebuild.py --skip-existing --out /out/debs")
+    # Our own packages; this also writes the Packages index over the whole dir.
+    steps.append("tools/build-packages.sh /out/debs")
     if variant == "live":
         steps.append("variant-live/build-inner.sh")
     elif variant == "netinst":
@@ -106,6 +111,9 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     p.add_argument("--base-image", default=None,
                    help="override the Containerfile base image (e.g. a registry mirror)")
     p.add_argument("--rebuild-image", action="store_true", help="rebuild the build container first")
+    p.add_argument("--no-rebuilds", action="store_true",
+                   help="skip the upstream Mint rebuilds (upstream/rebuilds.toml); the desktop then "
+                        "lacks mintmenu and mint-themes")
     p.add_argument("--dry-run", action="store_true", help="print the commands instead of running them")
     args = p.parse_args(argv)
     if args.arch != host_arch() and args.variant != "packages":
@@ -135,7 +143,7 @@ def main(argv: list[str] | None = None) -> int:
           f"snapshot={args.snapshot} -> {output}")
 
     runtime = pick_runtime(args.runtime)
-    script = inner_script(args.variant)
+    script = inner_script(args.variant, rebuilds=not args.no_rebuilds)
 
     if runtime == "none":
         # Direct mode: map container paths onto the host.

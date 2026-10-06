@@ -19,7 +19,7 @@ MATE".
 | `mate-desktop` | 1.26.2 | **1.28.2** | Upstream MATE 1.28 has been out since 2024. Debian stable is a release behind. |
 | `mate-panel` | 1.27.1 | 1.27.1 | |
 | `caja` / `marco` | 1.26.4 / 1.26.2 | 1.26.4 / 1.26.2 | Forky has not moved to 1.28 for these either. |
-| `mate-menu` | 22.04.2 | 22.04.2 | Ubuntu MATE's menu, a fork of mintmenu. **Our default for now.** |
+| `mate-menu` | 22.04.2 | 22.04.2 | Ubuntu MATE's menu, a fork of mintmenu. We use the real mintmenu instead (below). |
 | `mate-tweak` | 22.10.0 | 22.10.0 | Panel layout switcher, which reads `/usr/share/mate-panel/layouts/*.layout`. |
 | `slick-greeter` | 2.0.9 | 2.2.7 | Mint's LightDM greeter. |
 | `lightdm-settings` | yes | yes | |
@@ -46,30 +46,42 @@ Only **`mintdrivers`** is tied to Ubuntu: it hard-depends on
 `ubuntu-drivers-common`. `mintupdate` needs Mint-only helpers (`mint-common`,
 `mint-mirrors`, `aptkit`), which are Mint-specific but not Ubuntu-specific.
 
-## What the kickoff ISO ships
+## Rebuilt Mint packages (working now)
+
+`upstream/rebuilds.toml` lists what we rebuild, and `tools/rebuild.py` builds
+each entry inside the build container. `build.py` runs it before every
+package/ISO build and caches the results in `out/debs/`. These are verified
+to build on trixie and to install together on a clean trixie system:
+
+| Package | Source | Notes |
+|---|---|---|
+| `mint-x-icons` 1.7.9 | tag `1.7.9` | Runtime dependency of mint-themes |
+| `mint-themes` 2.4.2 | tag `2.4.2` | Provides **Mint-Y-Dark-Sand** (GTK) and **Mint-Y-Sand** (marco/metacity titlebars) |
+| `mintmenu` 6.2.3 | `master` pinned to commit `b0ff4eb` | Mint stopped tagging at 5.9.0, a Python 2 release. 6.2.3 is what LMDE 7 ships. All its dependencies are in Debian main. |
+
+## What the ISO ships
 
 `ageless-desktop-mate` sets these defaults through a GSettings vendor
 override, so users can change all of them:
 
-- panel layout `ageless` (Mint-style bottom panel, `mate-menu`, launchers
-  for terminal and files, window list, tray, clock), selectable in mate-tweak
-- GTK/window theme `Arc-Dark` and icons `Mint-Y-Sand`. They are stand-ins
-  until `mint-themes` is rebuilt: a dark theme with a gold accent, matching
+- panel layout `ageless`: Mint-style bottom panel with **mintmenu**,
+  launchers for terminal and files, window list, tray and clock. It is
+  selectable in mate-tweak.
+- GTK theme `Mint-Y-Dark-Sand`, marco theme `Mint-Y-Sand`, icons
+  `Mint-Y-Sand`. That gives a dark theme with a sand/gold accent, matching
   agelesslinux.org.
 - LightDM + slick-greeter with the Ageless wallpaper and logo
 - Noto fonts
 
-## Rebuild plan (the next phase)
+`build.py --no-rebuilds` skips the rebuild step, but the desktop package
+depends on mintmenu and mint-themes, so that is only useful for
+`--variant packages`.
 
-`upstream/rebuilds.toml` lists what we rebuild into the `timeless` archive,
-and `tools/rebuild.py` builds each entry inside the build container:
+## Rebuild plan (next)
 
-1. **Mint pieces from their GitHub tags**: `mint-themes`, `mintmenu`, then
-   the X-Apps. These are native Debian packages upstream (they ship
-   `debian/`), so `dpkg-buildpackage` on a trixie chroot is the whole job.
-   When `mintmenu` lands, swap the applet IID in
-   `packages/ageless/desktop/ageless.layout` to
-   `MintMenuAppletFactory::MintMenuApplet`.
+1. **More Mint**: the X-Apps (`xed`, `xviewer`, `xreader`, `pix`),
+   `mintupdate` + `mint-common`, `mintinstall` (the Software Manager, a
+   starting point for an "ageless store"), `warpinator`.
 2. **MATE 1.28 backports from forky**: `mate-desktop` first, then the rest
    of the stack as forky gets it. Backport with a `~ageless0.1` version
    suffix so a later Debian release supersedes it cleanly.

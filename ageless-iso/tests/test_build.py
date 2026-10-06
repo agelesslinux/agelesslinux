@@ -46,6 +46,11 @@ class BuildPyTests(unittest.TestCase):
         self.assertIn("variant-netinst/build-inner.sh", build.inner_script("netinst"))
         self.assertNotIn("variant-", build.inner_script("packages"))
 
+    def test_rebuilds_run_before_package_index(self):
+        script = build.inner_script("live")
+        self.assertLess(script.index("tools/rebuild.py"), script.index("tools/build-packages.sh"))
+        self.assertNotIn("tools/rebuild.py", build.inner_script("live", rebuilds=False))
+
     def test_dry_run_live_is_privileged_and_passes_stance(self):
         out = io.StringIO()
         with contextlib.redirect_stdout(out):

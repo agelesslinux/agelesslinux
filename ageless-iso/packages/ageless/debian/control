@@ -68,14 +68,17 @@ Package: ageless-desktop-mate
 Architecture: all
 Depends: ageless-standard | ageless-flagrant,
          mate-desktop-environment-core,
+         mintmenu,
+         mint-themes,
+         mint-y-icons,
          ${misc:Depends}
-Recommends: mate-desktop-environment, mate-menu, mate-tweak,
-            lightdm, slick-greeter, lightdm-settings, mint-y-icons, arc-theme,
+Recommends: mate-desktop-environment, mate-tweak,
+            lightdm, slick-greeter, lightdm-settings,
             fonts-noto-core, blueman, network-manager-gnome, system-config-printer,
             synaptic, gdebi, timeshift, firefox-esr
 Description: Ageless Linux MATE desktop defaults
- Default wallpaper, theme, panel layout and greeter configuration for the
- Ageless Linux MATE desktop. Settings are applied as GSettings vendor
+ Default wallpaper, theme (Mint-Y-Dark-Sand), panel layout (mintmenu) and
+ greeter configuration for the Ageless Linux MATE desktop. Settings are applied as GSettings vendor
  overrides, so users can still change everything.
 
 Package: ageless-maker

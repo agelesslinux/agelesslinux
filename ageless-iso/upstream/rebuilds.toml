@@ -1,11 +1,19 @@
 # Packages Ageless Linux rebuilds for its archive (see docs/mate-and-mint.md).
 # Built by tools/rebuild.py inside the build container.
 #
-#   kind = "git"       clone url at ref, dpkg-buildpackage (upstream ships debian/)
+#   kind = "git"       clone url at ref (optionally pinned to `commit`), then
+#                      dpkg-buildpackage (upstream ships debian/)
 #   kind = "backport"  apt-get source from `from_suite`, rebuild for trixie with
 #                      a ~ageless version suffix so Debian's next release wins
 #
 # `enabled = false` entries are planned but not yet validated.
+
+[[package]]
+name = "mint-x-icons"
+kind = "git"
+url = "https://github.com/linuxmint/mint-x-icons.git"
+ref = "1.7.9"
+why = "runtime dependency of mint-themes; not in Debian"
 
 [[package]]
 name = "mint-themes"
@@ -18,7 +26,10 @@ why = "Mint-Y GTK theme; Debian ships only mint-y-icons"
 name = "mintmenu"
 kind = "git"
 url = "https://github.com/linuxmint/mintmenu.git"
-ref = "5.9.0"
+# Mint stopped tagging mintmenu at 5.9.0 (Python 2). 6.2.3 lives on master;
+# pin the commit so builds are repeatable.
+ref = "master"
+commit = "b0ff4eb20c1e670d93a966e3d80d4374f25f0a1b"
 why = "Mint's MATE menu; replaces mate-menu in the ageless panel layout"
 
 [[package]]

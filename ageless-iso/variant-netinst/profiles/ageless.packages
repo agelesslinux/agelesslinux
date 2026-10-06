@@ -4,3 +4,6 @@ ageless-os-release
 ageless-agelessd
 @STANCE_PACKAGES@
 ageless-desktop-mate
+mintmenu
+mint-themes
+mint-x-icons

@@ -49,7 +49,7 @@ lb config \
     --distribution "$DEBIAN_SUITE" \
     --architecture "$ARCH" \
     --linux-flavours "$FLAVOUR" \
-    --archive-areas "main contrib non-free-firmware" \
+    --archive-areas "main non-free-firmware" \
     --mirror-bootstrap "$MIRROR" \
     --mirror-chroot "$MIRROR" \
     --mirror-chroot-security "$SECURITY_MIRROR" \

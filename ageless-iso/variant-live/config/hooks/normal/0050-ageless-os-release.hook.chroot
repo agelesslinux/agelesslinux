@@ -1,0 +1,21 @@
+#!/bin/sh
+# live-build (bootstrap_debootstrap) replaces the /etc/os-release symlink
+# with a static copy of Debian's file, held in place by a local diversion, so
+# it can append IMAGE_ID/BUILD_ID. That copy would hide ageless-os-release and
+# would be cloned onto installed systems by Calamares. Undo it, keep BUILD_ID.
+set -e
+
+build_id="$(sed -n 's/^BUILD_ID=//p' /etc/os-release)"
+
+if dpkg-divert --list /etc/os-release | grep -q 'local diversion'; then
+    rm -f /etc/os-release
+    dpkg-divert --local --remove --no-rename --divert /etc/os-release.debootstrap /etc/os-release
+fi
+rm -f /etc/os-release.debootstrap
+ln -sf ../usr/lib/os-release /etc/os-release
+
+if [ -n "$build_id" ]; then
+    mkdir -p /etc/ageless
+    echo "BUILD_ID=$build_id" > /etc/ageless/os-release.extra
+    ageless-update-os-release
+fi

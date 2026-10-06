@@ -1,0 +1,6 @@
+---
+type:       "job"
+name:       "ageless-autoremove"
+interface:  "process"
+command:    "/usr/share/calamares/helpers/calamares-ageless-autoremove"
+timeout:    900

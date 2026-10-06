@@ -1,8 +1,0 @@
-# Common real-hardware firmware (non-free-firmware component)
-firmware-linux-free
-firmware-misc-nonfree
-firmware-iwlwifi
-firmware-realtek
-firmware-atheros
-firmware-amd-graphics
-firmware-sof-signed
