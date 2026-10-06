@@ -91,7 +91,9 @@ esac
 for deb in "$DEBS_DIR"/*.deb; do
     base="$(basename "$deb")"
     [[ "$base" =~ $skip ]] && continue
-    [[ "$base" == ageless-maker_* ]] && continue   # maker toolkit: repo only, not the ISO
+    # Archive-only packages: the maker toolkit, the per-law flagrant time
+    # capsules (ageless-flagrant-vpn etc.) and the ageless-device tools.
+    [[ "$base" =~ ^(ageless-maker|ageless-flagrant-[a-z]+|ageless-device)_ ]] && continue
     cp "$deb" config/packages.chroot/
 done
 echo "$meta" > config/package-lists/stance.list.chroot

@@ -157,6 +157,16 @@ def serial_check(iso: Path, arch: str, timeout: int, artifacts: Path, netinst: b
                 time.sleep(2)
                 if shot.exists():
                     print(f"   desktop screenshot: {ppm_to_png(shot)}", flush=True)
+                if not netinst:
+                    # Tap Super, mintmenu's default hot key, and keep a picture
+                    # of the open menu. Advisory: it is never a failure.
+                    monitor_command(mon, "sendkey meta_l")
+                    time.sleep(20)
+                    shot = artifacts / "menu.ppm"
+                    monitor_command(mon, f"screendump {shot}")
+                    time.sleep(2)
+                    if shot.exists():
+                        print(f"   menu screenshot: {ppm_to_png(shot)}", flush=True)
         finally:
             proc.kill()
             proc.wait()

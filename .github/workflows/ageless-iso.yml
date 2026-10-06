@@ -1,6 +1,9 @@
 # Ageless Linux ISO pipeline.
 #   push / PR touching ageless-iso/  -> lint, build .debs, build + smoke-test ISOs
-#   tag v*                           -> same, pinned to the snapshot, plus a GitHub Release
+#   tag v*                           -> same, pinned to the snapshot, release versions,
+#                                       plus a draft GitHub Release
+#   push to main                     -> also publishes the signed apt archive to GitHub
+#                                       Pages, once enabled (docs/upgrades.md)
 #   workflow_dispatch                -> manual run, optionally flagrant / pinned
 name: ageless-iso
 
@@ -38,12 +41,16 @@ jobs:
       - name: shellcheck
         run: |
           sudo apt-get install -y -qq shellcheck
-          shellcheck -S warning variant-*/build-inner.sh tools/*.sh \
+          shellcheck -S warning variant-*/build-inner.sh tools/*.sh tests/*.sh \
             packages/ageless/os-release/ageless-update-os-release \
-            packages/ageless/agelessd/agelessd
+            packages/ageless/agelessd/agelessd \
+            packages/ageless/desktop/ageless-desktop-reset
       - name: python
         run: |
-          python3 -m py_compile build.py tests/smoke.py
+          python3 -m py_compile build.py tests/smoke.py tools/*.py \
+            packages/ageless/sysinfo/ageless_sysinfo.py packages/ageless/sysinfo/ageless-flagrant \
+            packages/ageless/sysinfo/ageless-system-info packages/ageless-device/bin/ageless-device \
+            packages/mintmenu/usr/lib/linuxmint/mintMenu/apt-helper.py
           python3 -m unittest discover -s tests -p 'test_*.py' -v
 
   packages:
@@ -51,13 +58,59 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: { fetch-depth: 0 }
-      - name: Build ageless-* packages
-        run: ./build.py --variant packages --runtime docker
+      - name: Build packages and the apt archive
+        run: |
+          args=(--variant packages --runtime docker)
+          [[ "${{ startsWith(github.ref, 'refs/tags/v') }}" == true ]] && args+=(--release)
+          ./build.py "${args[@]}"
+      - name: Install and exercise them on a clean trixie
+        run: docker run --rm -v "$PWD:/src:ro" -v "$PWD/out/repo:/repo:ro" debian:trixie bash /src/tests/package-test.sh
       - uses: actions/upload-artifact@v4
         with:
           name: debs
           path: ageless-iso/out/debs/
           retention-days: 14
+      - uses: actions/upload-artifact@v4
+        with:
+          name: apt-repo
+          path: ageless-iso/out/repo/
+          retention-days: 14
+
+  # Signed apt archive on GitHub Pages: what installed systems upgrade from.
+  # Off until the repository variable AGELESS_APT_PUBLISH is "true" and the
+  # AGELESS_ARCHIVE_SIGNING_KEY secret exists (docs/upgrades.md).
+  apt-archive:
+    if: vars.AGELESS_APT_PUBLISH == 'true' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+    needs: [lint, packages]
+    runs-on: ubuntu-24.04
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { name: apt-repo, path: ageless-iso/out/repo }
+      - name: Sign
+        env:
+          SIGNING_KEY: ${{ secrets.AGELESS_ARCHIVE_SIGNING_KEY }}
+        run: |
+          if [ -z "$SIGNING_KEY" ]; then
+            echo "::error::AGELESS_ARCHIVE_SIGNING_KEY is not set; see docs/upgrades.md"; exit 1
+          fi
+          export GNUPGHOME="$(mktemp -d)"
+          printf '%s\n' "$SIGNING_KEY" | gpg --batch --import
+          fpr=$(gpg --batch --with-colons --list-secret-keys | awk -F: '/^fpr:/ {print $10; exit}')
+          python3 tools/make-repo.py sign out/repo --key "$fpr"
+          gpg --batch --armor --export "$fpr" > out/repo/ageless-archive-keyring.asc
+          printf '<!doctype html><title>Ageless Linux apt archive</title><p>This is an apt archive. See <a href="https://github.com/agelesslinux/agelesslinux/blob/main/ageless-iso/docs/upgrades.md">docs/upgrades.md</a>.</p>\n' > out/repo/index.html
+          touch out/repo/.nojekyll
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: ageless-iso/out/repo }
+      - id: deploy
+        uses: actions/deploy-pages@v4
 
   iso:
     needs: [lint, packages]
@@ -97,6 +150,7 @@ jobs:
           if [[ "${{ startsWith(github.ref, 'refs/tags/v') || inputs.pinned }}" != true ]]; then
             args+=(--snapshot none)   # day-to-day builds track deb.debian.org; releases use the pin
           fi
+          [[ "${{ startsWith(github.ref, 'refs/tags/v') }}" == true ]] && args+=(--release)
           [[ "${{ inputs.flagrant }}" == true ]] && args+=(--flagrant)
           ./build.py "${args[@]}"
           ls -lh out/

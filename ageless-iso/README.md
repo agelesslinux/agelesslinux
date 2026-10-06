@@ -18,7 +18,8 @@ only Python 3 and Podman or Docker.
 ./build.py --variant live                 # live ISO: MATE desktop + Calamares installer
 ./build.py --variant netinst              # netinstall ISO: stock debian-installer + preseed
 ./build.py --variant live --flagrant      # flagrant mode (ageless-refusal)
-./build.py --variant packages             # just the .debs, in out/debs/
+./build.py --variant packages             # just the .debs (out/debs/) and an apt archive (out/repo/)
+./build.py --variant packages --release   # release versions (default: +git<date>.<time>.<sha> dev versions)
 ./build.py --variant live --dry-run       # show the container commands
 ```
 
@@ -46,9 +47,16 @@ Packages (in `packages/`, built by `tools/build-packages.sh`):
 | `ageless-refusal` | Flagrant mode: the refusal statement and `/etc/ageless/REFUSAL`. Conflicts with `ageless-compliance`. |
 | `ageless-agelessd` | 24-hour timer that neutralizes systemd userdb `birthDate`. Does nothing unless `systemd-userdbd` is installed. |
 | `ageless-standard` / `ageless-flagrant` | Metapackages for the two stances |
-| `ageless-desktop-mate` | Wallpaper, Mint-style panel layout, theme and font defaults, slick-greeter config |
+| `ageless-desktop-mate` | Wallpaper, Mint-style panel layout, theme and font defaults, slick-greeter config, `ageless-desktop-reset` |
+| `ageless-system-info` | **Ageless System Info**: system facts plus *Laws & Flagrant mode*, a dated, sourced catalog of laws aimed at operating systems, each with a switch that installs its "time capsule" ([docs/laws.md](docs/laws.md)). Also the `ageless-flagrant` CLI. |
+| `ageless-flagrant-vpn` / `-vision` / `-crypto` | The time capsules: VPN and anonymity tools; computer-vision building blocks; encryption tools. Archive only. |
 | `ageless-maker` | Metapackage of maker tools (Arduino, KiCad, FreeCAD, slicers, serial terminals). In the archive, not on the ISO. |
+| `ageless-device` | Ageless Device (RP2040/RP2350) support: udev rules and the `ageless-device` CLI ([docs/ageless-device.md](docs/ageless-device.md)). Archive only. |
+| `ageless-keyring` | Archive key + apt source. Built once `keys/archive.asc` exists ([docs/upgrades.md](docs/upgrades.md)). |
+| `mintmenu` | **Our fork** of Linux Mint's menu, a git subtree with Debian fixes ([docs/mintmenu.md](docs/mintmenu.md)) |
 | `calamares-settings-ageless` | Fork of `calamares-settings-debian` with Ageless branding |
+
+![Ageless System Info: Laws & Flagrant mode](docs/screenshots/sysinfo-laws.png)
 
 ## Layout
 
@@ -59,8 +67,9 @@ containers/Containerfile.build
 packages/                   our Debian source packages
 variant-live/               live-build config + build-inner.sh
 variant-netinst/            simple-cdd profile + build-inner.sh
-upstream/rebuilds.toml      Mint/MATE packages we rebuild (tools/rebuild.py)
-tests/                      QEMU smoke test, unit tests
+upstream/rebuilds.toml      Mint/MATE packages we rebuild unchanged (tools/rebuild.py)
+tools/make-repo.py          apt archive: build, sign, serve (dev loop)
+tests/                      QEMU smoke test, package install/upgrade test, unit tests
 docs/                       roadmap, MATE/Mint research, fork guide
 ```
 
@@ -71,10 +80,11 @@ QEMU smoke test, and creates a draft release on `v*` tags.
 ## Known gaps
 
 - **No Secure Boot**: disable it to boot the ISO (roadmap §2).
-- **No signed archive yet.** `apt.agelesslinux.org` and `ageless-keyring`
-  are Phase 1 work. Until then, installed systems take updates from Debian
-  only. The Calamares `sources-final` step adds the Ageless archive
-  automatically once the keyring package exists.
+- **No archive key yet.** Everything for a signed archive is in place
+  (`tools/new-archive-key.py`, `ageless-keyring`, the CI publishing job),
+  but it waits on a key and on Pages being enabled. Until then, use the
+  development loop in [docs/upgrades.md](docs/upgrades.md) to upgrade an
+  installed system.
 - The d-i image skips **32-bit UEFI** boot. simple-cdd 0.6.9 still expects
   i386 installer images, which trixie no longer ships; `variant-netinst/build-inner.sh`
   works around this and fails loudly once upstream fixes it.
@@ -86,5 +96,9 @@ QEMU smoke test, and creates a draft release on `v*` tags.
 - `/etc/issue` still says Debian, until we fork base-files.
 
 See [docs/ROADMAP.md](docs/ROADMAP.md) for the plan,
+[docs/upgrades.md](docs/upgrades.md) for upgrading installed systems,
+[docs/mintmenu.md](docs/mintmenu.md) for the menu fork,
+[docs/laws.md](docs/laws.md) for Laws & Flagrant mode,
+[docs/ageless-device.md](docs/ageless-device.md) for the device,
 [docs/mate-and-mint.md](docs/mate-and-mint.md) for the desktop work and
 [docs/gotchas.md](docs/gotchas.md) for everything that broke along the way.

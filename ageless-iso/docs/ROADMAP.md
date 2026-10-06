@@ -44,6 +44,22 @@ plumbing. Where it departs from the 0.1 draft, this section wins.
 - [x] Packages: `ageless` (8 binaries) and `calamares-settings-ageless`
 - [x] CI: `.github/workflows/ageless-iso.yml` (lint → debs → {live, netinst} × {amd64, arm64} → QEMU smoke → draft release on `v*` tags)
 
+
+## Second round (2026-10-06): the four themes
+
+John set four directions after the kickoff. Where these depart from the
+sections below, this table wins.
+
+| Theme | Decision | Where |
+|---|---|---|
+| mintmenu is the desktop's personality | **Fork it in-tree** as a squashed `git subtree` of linuxmint/mintmenu at `packages/mintmenu` (6.2.3 → `6.2.3+ageless1`), built like our own packages, instead of rebuilding upstream from `rebuilds.toml`. The Mint-only features (Uninstall, Install, community search) now work on Debian, and the default favourites are ours. | [mintmenu.md](mintmenu.md) |
+| In-place upgrades | Development builds get `+git<date>.<time>.<sha>` versions, so every build is an apt upgrade. `tools/make-repo.py` builds a standard `dists/timeless` archive. A dev loop serves `out/debs` over HTTP with `[trusted=yes]`. CI publishes a signed archive to GitHub Pages once a key exists. | [upgrades.md](upgrades.md) |
+| Archive tooling (§5.1) | **apt-ftparchive via `tools/make-repo.py`**, not reprepro. CI rebuilds the whole archive on every push (newest version of each package only), so there's no state to keep. Revisit with reprepro when we need `timeless-proposed` and history. | `tools/make-repo.py` |
+| Signing (§5.3) | **Phase 1: the key lives in the GitHub secret `AGELESS_ARCHIVE_SIGNING_KEY`**, made with `tools/new-archive-key.py` (ed25519, no passphrase, 3-year expiry). The offline master + YubiKey signing host in §5.3 stays the target before outside users depend on the archive. `ageless-keyring` takes every `keys/*.asc`, so rotation is an overlap release. | [upgrades.md](upgrades.md) |
+| Privacy and regional laws | **Ageless System Info** (`ageless-system-info`): our own GTK app, not a patch to MATE's or Mint's. It shows system facts plus a dated, sourced law catalog (`laws.toml`). Each law has a flagrant switch that installs a Debian-main "time capsule" metapackage: `ageless-flagrant-vpn`, `-vision`, `-crypto`. The age-signal law flips the existing stance. CLI: `ageless-flagrant`. | [laws.md](laws.md) |
+| Stance files | `/etc/ageless/REFUSAL` and `ab1043-compliance.txt` became symlinks into `/usr/share/ageless/<stance>/`. As 0.1.0 conffiles they survived `apt remove`, so a stance switch left the old stance behind. | `packages/ageless` 0.1.1 |
+| Ageless Device | `ageless-device` package: udev `uaccess` rules for RP2040/RP2350 in every mode, plus a Python CLI (list/flash/push/pull/repl). Wi-Fi store designed, not built; the firmware runtime is the open question. | [ageless-device.md](ageless-device.md) |
+
 ---
 
 ## 1. Goals

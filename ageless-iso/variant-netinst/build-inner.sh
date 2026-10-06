@@ -48,7 +48,7 @@ for deb in "$DEBS_DIR"/*.deb; do
     case "$STANCE:$base" in
         standard:ageless-refusal_*|standard:ageless-flagrant_*) continue ;;
         flagrant:ageless-compliance_*|flagrant:ageless-standard_*) continue ;;
-        *:ageless-maker_*) continue ;;
+        *:ageless-maker_*|*:ageless-flagrant-*_*|*:ageless-device_*) continue ;;
     esac
     cp "$deb" local/
 done
