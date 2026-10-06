@@ -5,6 +5,12 @@ an installable distribution: a MATE desktop in the Linux Mint style on a
 Debian base (think LMDE with MATE). The ISOs carry the same refusal of
 California AB 1043 age verification as `become-ageless.sh`.
 
+![Ageless Linux live desktop](docs/screenshots/live-desktop.png)
+
+*The live session, captured by `tests/smoke.py`: MATE with mintmenu and
+Mint-Y-Dark-Sand. Boot menus: [UEFI/GRUB](docs/screenshots/boot-uefi-grub.png),
+[BIOS/isolinux](docs/screenshots/boot-bios-isolinux.png).*
+
 One command builds everything inside a pinned container. The host needs
 only Python 3 and Podman or Docker.
 
