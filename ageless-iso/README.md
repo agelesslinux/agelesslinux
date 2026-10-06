@@ -79,5 +79,6 @@ QEMU smoke test, and creates a draft release on `v*` tags.
   Phase 2 `ageless-installer-theme` (rootskel-gtk + debian-cd splash) work.
 - `/etc/issue` still says Debian, until we fork base-files.
 
-See [docs/ROADMAP.md](docs/ROADMAP.md) for the plan and
-[docs/mate-and-mint.md](docs/mate-and-mint.md) for the desktop work.
+See [docs/ROADMAP.md](docs/ROADMAP.md) for the plan,
+[docs/mate-and-mint.md](docs/mate-and-mint.md) for the desktop work and
+[docs/gotchas.md](docs/gotchas.md) for everything that broke along the way.

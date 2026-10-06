@@ -28,3 +28,6 @@ idle-delay=15
 
 [org.mate.screensaver]
 lock-enabled=true
+
+[com.linuxmint.mintmenu]
+applet-icon='ageless-logo-symbolic'

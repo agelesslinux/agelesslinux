@@ -4,3 +4,4 @@ desktop/90-ageless-slick-greeter.conf usr/share/lightdm/lightdm.conf.d
 desktop/slick-greeter.conf etc/lightdm
 build/ageless-default.png usr/share/backgrounds/ageless
 build/ageless-default-4k.png usr/share/backgrounds/ageless
+desktop/artwork/ageless-logo-symbolic.svg usr/share/icons/hicolor/scalable/apps

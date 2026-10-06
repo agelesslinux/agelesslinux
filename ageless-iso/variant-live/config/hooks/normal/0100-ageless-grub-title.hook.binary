@@ -1,0 +1,9 @@
+#!/bin/sh
+# live-build only blanks the GRUB theme's title-text when it uses its own
+# fallback splash. Ours (config/bootloaders/splash.svg) already carries the
+# name, so drop "Live Boot Menu with GRUB" rather than print it over the art.
+set -e
+theme=boot/grub/live-theme/theme.txt
+if [ -f "$theme" ]; then
+    sed -i -e 's|^title-text:.*|title-text: ""|' "$theme"
+fi
