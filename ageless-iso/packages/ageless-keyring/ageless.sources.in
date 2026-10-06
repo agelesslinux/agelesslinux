@@ -1,0 +1,7 @@
+# Ageless Linux packages (ageless-*, the mintmenu fork, Mint rebuilds).
+# Installed by ageless-keyring. Debian's own sources are in debian.sources.
+Types: deb
+URIs: @AGELESS_ARCHIVE_URL@
+Suites: @AGELESS_CODENAME@
+Components: main
+Signed-By: /usr/share/keyrings/ageless-archive-keyring.gpg

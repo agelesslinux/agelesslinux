@@ -22,18 +22,10 @@ deb http://deb.debian.org/debian $RELEASE-backports main non-free-firmware
 deb-src http://deb.debian.org/debian $RELEASE-backports main non-free-firmware
 EOF
 
-# Ageless Linux archive. Only enabled once ageless-keyring is in the target,
-# so an installed system never carries an unverifiable source.
+# Ageless Linux archive: ageless-keyring (installed on the live system once an
+# archive key exists) ships /etc/apt/sources.list.d/ageless.sources itself, so
+# it is copied to the target with the rest of the live filesystem. Nothing to
+# write here; the suite is kept for reference.
 AGELESS_SUITE="timeless"
-AGELESS_KEYRING=/usr/share/keyrings/ageless-archive-keyring.gpg
-if [ -f "$CHROOT$AGELESS_KEYRING" ]; then
-    cat << EOF > $CHROOT/etc/apt/sources.list.d/ageless.sources
-Types: deb
-URIs: https://apt.agelesslinux.org
-Suites: $AGELESS_SUITE
-Components: main
-Signed-By: $AGELESS_KEYRING
-EOF
-fi
 
 exit 0

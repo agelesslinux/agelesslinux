@@ -1,0 +1,37 @@
+#!/bin/sh
+# ageless-desktop-reset: re-apply the Ageless MATE defaults for the current user.
+#
+# Package upgrades change the *defaults* (panel layout, theme, menu
+# favourites), but MATE keeps each user's own copy in dconf once it has
+# started, so an upgraded ageless.layout or applications.list never reaches an
+# existing session. Run this after `apt full-upgrade` while iterating on the
+# desktop. It resets only the panel (and, with --all, the theme, fonts,
+# wallpaper and mintmenu settings); files in your home directory are kept.
+#
+#   ageless-desktop-reset          panel layout only
+#   ageless-desktop-reset --all    panel + appearance + mintmenu
+set -eu
+
+case "${1:-}" in
+    "") all=no ;;
+    --all) all=yes ;;
+    -h|--help) sed -n '2,13p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    *) echo "usage: ageless-desktop-reset [--all]" >&2; exit 2 ;;
+esac
+
+if [ "$all" = yes ]; then
+    for schema in org.mate.interface org.mate.Marco.general org.mate.background \
+                  org.mate.font-rendering com.linuxmint.mintmenu \
+                  com.linuxmint.mintmenu.plugins.applications; do
+        gsettings list-schemas | grep -qx "$schema" && gsettings reset-recursively "$schema"
+    done
+fi
+
+# Applets run as their own processes and outlive a panel restart, so stop
+# mintmenu first; the panel starts it again (new Python code included).
+# --reset wipes /org/mate/panel/ and reloads the layout; --replace restarts
+# the running panel.
+pkill -x mintmenu || true
+dconf reset -f /org/mate/panel/
+nohup mate-panel --reset --layout ageless --replace >/dev/null 2>&1 &
+echo "Panel reset to the 'ageless' layout."

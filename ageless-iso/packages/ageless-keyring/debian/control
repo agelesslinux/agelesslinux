@@ -1,0 +1,19 @@
+Source: ageless-keyring
+Section: misc
+Priority: optional
+Maintainer: Ageless Linux <archive@agelesslinux.org>
+Build-Depends: debhelper-compat (= 13), gpg
+Standards-Version: 4.7.0
+Rules-Requires-Root: no
+Homepage: https://agelesslinux.org
+Vcs-Git: https://github.com/agelesslinux/agelesslinux.git
+Vcs-Browser: https://github.com/agelesslinux/agelesslinux
+
+Package: ageless-keyring
+Architecture: all
+Depends: ${misc:Depends}
+Description: Ageless Linux archive keyring and apt source
+ The OpenPGP key that signs the Ageless Linux package archive, and the apt
+ source (/etc/apt/sources.list.d/ageless.sources) that uses it. With this
+ installed, "apt update && apt full-upgrade" brings an installed system to
+ the latest Ageless Linux packages.

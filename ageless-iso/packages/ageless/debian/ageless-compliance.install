@@ -1,2 +1,2 @@
-compliance/ab1043-compliance.txt etc/ageless
+compliance/ab1043-compliance.txt usr/share/ageless/compliance
 compliance/age-verification-api usr/libexec/ageless

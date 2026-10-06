@@ -1,0 +1,16 @@
+#!/usr/bin/make -f
+AGELESS_RELEASE_ENV ?= $(CURDIR)/../../common/release.env
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	mkdir -p build
+	cat keys/*.asc | gpg --dearmor > build/ageless-archive-keyring.gpg
+	set -a; . "$(AGELESS_RELEASE_ENV)"; \
+	sed -e "s|@AGELESS_ARCHIVE_URL@|$$AGELESS_ARCHIVE_URL|g" \
+	    -e "s|@AGELESS_CODENAME@|$$AGELESS_CODENAME|g" \
+	    ageless.sources.in > build/ageless.sources
+
+override_dh_auto_clean:
+	rm -rf build

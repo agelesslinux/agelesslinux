@@ -16,7 +16,7 @@ RUN arch="$(dpkg --print-architecture)" \
       live-build debootstrap mmdebstrap simple-cdd debian-cd \
       xorriso squashfs-tools mtools dosfstools cpio zstd xz-utils \
       grub-common syslinux-common \
-      dpkg-dev debhelper devscripts fakeroot build-essential \
+      dpkg-dev debhelper dh-python devscripts fakeroot build-essential \
       librsvg2-bin libglib2.0-bin \
       reprepro apt-utils gnupg ca-certificates curl git python3 rsync \
       qemu-utils \

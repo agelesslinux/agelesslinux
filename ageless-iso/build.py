@@ -65,6 +65,25 @@ def source_date_epoch() -> str:
         return str(int(time.time()))
 
 
+def dev_version_suffix() -> str:
+    """Version suffix for development builds, so apt sees every build as an upgrade.
+
+    0.1.0 < 0.1.0+git20261006.153012.1a2b3c4 < (later builds) < 0.1.1. A clean
+    checkout uses the commit time, so rebuilding a commit gives the same version;
+    a checkout with uncommitted changes uses the current time instead.
+    """
+    try:
+        sha = subprocess.run(["git", "-C", str(ROOT), "rev-parse", "--short=7", "HEAD"],
+                             check=True, capture_output=True, text=True).stdout.strip()
+        dirty = subprocess.run(["git", "-C", str(ROOT), "status", "--porcelain", "--", "."],
+                               check=True, capture_output=True, text=True).stdout.strip() != ""
+    except (OSError, subprocess.CalledProcessError):
+        sha, dirty = "nogit", True
+    import time
+    stamp = time.time() if dirty else int(source_date_epoch())
+    return "+git" + time.strftime("%Y%m%d.%H%M%S", time.gmtime(stamp)) + "." + sha
+
+
 def pick_runtime(requested: str) -> str:
     if requested != "auto":
         return requested
@@ -88,6 +107,9 @@ def inner_script(variant: str, rebuilds: bool = True) -> str:
         steps.append("python3 tools/rebuild.py --skip-existing --out /out/debs")
     # Our own packages; this also writes the Packages index over the whole dir.
     steps.append("tools/build-packages.sh /out/debs")
+    if variant == "packages":
+        # An apt archive (dists/ + pool/) for in-place upgrades; signed later, on the host.
+        steps.append("python3 tools/make-repo.py build /out/debs /out/repo")
     if variant == "live":
         steps.append("variant-live/build-inner.sh")
     elif variant == "netinst":
@@ -114,6 +136,10 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     p.add_argument("--no-rebuilds", action="store_true",
                    help="skip the upstream Mint rebuilds (upstream/rebuilds.toml); the desktop then "
                         "lacks mintmenu and mint-themes")
+    p.add_argument("--release", action="store_true",
+                   help="build release versions (as in debian/changelog). Without it, package "
+                        "versions get a +git<date>.<time>.<sha> suffix so apt treats each build "
+                        "as an upgrade (see docs/upgrades.md)")
     p.add_argument("--dry-run", action="store_true", help="print the commands instead of running them")
     args = p.parse_args(argv)
     if args.arch != host_arch() and args.variant != "packages":
@@ -137,10 +163,11 @@ def main(argv: list[str] | None = None) -> int:
         "DEBS_DIR": "/out/debs",
         "WORK_DIR": f"/build/{args.variant}-{args.arch}",
         "OUT_DIR": "/out",
+        "AGELESS_VERSION_SUFFIX": "" if args.release else dev_version_suffix(),
     }
     print(f"Ageless Linux {release['AGELESS_VERSION']} ({release['AGELESS_CODENAME']}) on Debian "
           f"{release['DEBIAN_SUITE']}: variant={args.variant} arch={args.arch} stance={env['STANCE']} "
-          f"snapshot={args.snapshot} -> {output}")
+          f"snapshot={args.snapshot} versions={env['AGELESS_VERSION_SUFFIX'] or 'release'} -> {output}")
 
     runtime = pick_runtime(args.runtime)
     script = inner_script(args.variant, rebuilds=not args.no_rebuilds)
