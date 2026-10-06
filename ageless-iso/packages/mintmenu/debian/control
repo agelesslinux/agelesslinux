@@ -1,0 +1,32 @@
+Source: mintmenu
+Section: admin
+Priority: optional
+Maintainer: Clement Lefebvre <root@linuxmint.com>
+Build-Depends: debhelper (>= 9), python3, dh-python,
+Standards-Version: 3.9.5
+
+Package: mintmenu
+Architecture: all
+Depends:
+ ${misc:Depends},
+ python3,
+ python3-apt,
+ python3-configobj,
+ python3-gi-cairo,
+ python3-setproctitle,
+ python3-unidecode,
+ python3-xlib,
+ python3-xdg,
+ python3-xapp,
+ python3-xlib,
+ xdg-utils,
+ libglib2.0-bin,
+ mate-menus,
+ gir1.2-matemenu-2.0,
+ gir1.2-matepanelapplet-4.0,
+ gir1.2-gtk-3.0,
+ gir1.2-matedesktop-2.0,
+ gir1.2-xapp-1.0
+Description: Advanced MATE menu
+ One of the most advanced menus under Linux. MintMenu supports filtering,
+ favorites, easy-uninstallation, autosession, and many other features.

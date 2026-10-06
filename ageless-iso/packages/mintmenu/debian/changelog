@@ -1,0 +1,1554 @@
+mintmenu (6.2.3) zena; urgency=medium
+
+  * Switch to XApp symbolic icons
+  * Switch to XSI
+  * Add .gitignore
+
+ -- Clement Lefebvre <root@linuxmint.com>  Fri, 21 Nov 2025 13:32:19 +0000
+
+mintmenu (6.2.2) zara; urgency=medium
+
+  [ Michael Webster ]
+  * applications.py: Reset application list order following a search.
+
+ -- Clement Lefebvre <root@linuxmint.com>  Wed, 06 Aug 2025 18:00:17 +0200
+
+mintmenu (6.2.1) zara; urgency=medium
+
+  [ luigifab ]
+  * Add CSS classes (#285)
+
+  [ Jesper ]
+  * Fix search (#283)
+
+  [ luigifab ]
+  * Repeat separator image to fill menu height (#287)
+
+  [ Clement Lefebvre ]
+  * keybinding: Initialize self.keycode
+
+ -- Clement Lefebvre <root@linuxmint.com>  Sun, 27 Jul 2025 12:12:51 +0200
+
+mintmenu (6.2.0) xia; urgency=medium
+
+  * favorites: Adapt to new Xed desktop path
+
+ -- Clement Lefebvre <root@linuxmint.com>  Sun, 01 Dec 2024 15:41:31 +0000
+
+mintmenu (6.1.9) xia; urgency=medium
+
+  * Remove references to apturl
+
+ -- Clement Lefebvre <root@linuxmint.com>  Thu, 28 Nov 2024 13:57:01 +0000
+
+mintmenu (6.1.8) wilma; urgency=medium
+
+  * favorites: Adapt to new desktop filename
+  * system: Hide terminal and package manager by default
+
+ -- Clement Lefebvre <root@linuxmint.com>  Tue, 25 Jun 2024 19:27:56 +0100
+
+mintmenu (6.1.7) victoria; urgency=medium
+
+  [ Michael Webster ]
+  * Add our own 'all applications' icon for consistency.
+
+ -- Clement Lefebvre <root@linuxmint.com>  Mon, 26 Jun 2023 11:07:53 +0200
+
+mintmenu (6.1.6) victoria; urgency=medium
+
+  [ Michael Webster ]
+  * Use XAppGpuOffloadHelper for gpu offloading, respect PrefersNonDefaultGPU desktop entry key.
+
+ -- Clement Lefebvre <root@linuxmint.com>  Mon, 05 Jun 2023 13:40:15 +0100
+
+mintmenu (6.1.5) vera; urgency=medium
+
+  [ monsta ]
+  * remove mint-common dependency (#274)
+
+ -- Clement Lefebvre <root@linuxmint.com>  Mon, 21 Nov 2022 11:57:37 +0000
+
+mintmenu (6.1.4) uma; urgency=medium
+
+  * Recent: Fix buttons layout
+
+ -- Clement Lefebvre <root@linuxmint.com>  Thu, 01 Jul 2021 13:39:07 +0100
+
+mintmenu (6.1.3) uma; urgency=medium
+
+  [ Vincent Vermeulen ]
+  * fix recently used documents sorting
+
+ -- Clement Lefebvre <root@linuxmint.com>  Fri, 25 Jun 2021 16:34:15 +0100
+
+mintmenu (6.1.2) ulyssa; urgency=medium
+
+  [ Vincent Vermeulen ]
+  * fix APT search
+
+  [ Clement Lefebvre ]
+  * Favorites: Add a scrolledwindow (#263)
+
+ -- Clement Lefebvre <root@linuxmint.com>  Sat, 02 Jan 2021 22:21:33 +0000
+
+mintmenu (6.1.1) ulyana; urgency=medium
+
+  [ Michael Webster ]
+  * applications.py: Fix dnd for re-ordering/adding favorites.
+  * recentHelper.py: Don't try to modify the recent list unless recents are enabled.
+
+ -- Clement Lefebvre <root@linuxmint.com>  Wed, 17 Jun 2020 16:30:48 +0100
+
+mintmenu (6.1.0) ulyana; urgency=medium
+
+  [ Michael Webster ]
+  * mintMenu.py: Refactor panel button construction to fix padding in different configurations.
+  * gtk: Fix a couple of deprecations
+
+ -- Clement Lefebvre <root@linuxmint.com>  Wed, 10 Jun 2020 16:43:29 +0100
+
+mintmenu (6.0.9) ulyana; urgency=medium
+
+  * Add missing dependency
+
+ -- Clement Lefebvre <root@linuxmint.com>  Wed, 10 Jun 2020 11:53:29 +0100
+
+mintmenu (6.0.8) ulyana; urgency=medium
+
+  * Search: Fix searching for accentuated strings
+
+ -- Clement Lefebvre <root@linuxmint.com>  Wed, 10 Jun 2020 11:49:34 +0100
+
+mintmenu (6.0.7) ulyana; urgency=medium
+
+  [ Michael Webster ]
+  * Support nvidia on-demand app launching.
+
+  [ Clement Lefebvre ]
+  * l10n: Update POT
+
+ -- Clement Lefebvre <root@linuxmint.com>  Thu, 14 May 2020 08:14:45 +0100
+
+mintmenu (6.0.6) ulyana; urgency=medium
+
+  * Switch to symbolic panel icon
+  * Remove applet text by default
+
+ -- Clement Lefebvre <root@linuxmint.com>  Fri, 24 Apr 2020 10:17:57 +0100
+
+mintmenu (6.0.5) ulyana; urgency=medium
+
+  * Fix typo in file path
+
+ -- Clement Lefebvre <root@linuxmint.com>  Thu, 23 Apr 2020 11:43:51 +0100
+
+mintmenu (6.0.4) ulyana; urgency=medium
+
+  [ Michael Webster ]
+  * all: Use python3
+  * Use gsettings for recent and favorite apps
+  * recent.py: Allow the clear button to apply to whichever tab is currently active.
+  * about dialog: Fix program name and use a license type.
+
+  [ Clement Lefebvre ]
+  * Fix launching pkexec applications (#248)
+
+  [ Michael Webster ]
+  * debian: Fix dependencies to require python3 variants.
+
+ -- Clement Lefebvre <root@linuxmint.com>  Fri, 03 Apr 2020 12:08:41 +0100
+
+mintmenu (6.0.3) tricia; urgency=medium
+
+  * Prefer mozo over menulibre
+
+ -- Clement Lefebvre <root@linuxmint.com>  Tue, 10 Dec 2019 16:08:06 +0000
+
+mintmenu (6.0.2) tricia; urgency=medium
+
+  * Preferences: Fix IconChooser argument
+
+ -- Clement Lefebvre <root@linuxmint.com>  Fri, 29 Nov 2019 12:01:48 +0000
+
+mintmenu (6.0.1) tricia; urgency=medium
+
+  * Change default menu icon
+  * Add menu icon selection
+  * l10n: Update POT
+
+ -- Clement Lefebvre <root@linuxmint.com>  Tue, 19 Nov 2019 14:00:41 +0000
+
+mintmenu (6.0.0) tricia; urgency=medium
+
+  * Fix blurry icon in HiDPI
+  * Applet: Fix handling of symbolic icons
+  * Applet: Fix changing the icon to a symbolic icon
+  * Applet: Fix compatibility with symbolic pngs
+  * Add missing dep on python-gi-cairo
+
+ -- Clement Lefebvre <root@linuxmint.com>  Wed, 13 Nov 2019 10:37:02 +0100
+
+mintmenu (5.9.9) tina; urgency=medium
+
+  [ monsta ]
+  * depend on gir1.2-matedesktop-2.0 instead of gir1.2-mate-desktop (#231)
+  * plugins: fix number of callback arguments (#236)
+  * depend on python3-xapp instead of python-xapp (#238)
+
+  [ Clement Lefebvre ]
+  * RecentApp: Fix crash when location doesn't exist
+  * Applications: Fix empty apps when a category has no icon
+
+ -- Clement Lefebvre <root@linuxmint.com>  Thu, 26 Sep 2019 10:09:57 +0100
+
+mintmenu (5.9.8) tina; urgency=medium
+
+  * Don't depend on a menu editor
+
+ -- Clement Lefebvre <root@linuxmint.com>  Mon, 29 Jul 2019 12:24:03 +0200
+
+mintmenu (5.9.7) tina; urgency=medium
+
+  * Add support for menulibre
+
+ -- Clement Lefebvre <root@linuxmint.com>  Tue, 23 Jul 2019 12:34:08 +0200
+
+mintmenu (5.9.6) tina; urgency=medium
+
+  * Switch to symbolic icons
+  * Fix crash on non-existing favorites
+  * Remove support for custom colors
+  * l10n: Update POT
+
+ -- Clement Lefebvre <root@linuxmint.com>  Mon, 22 Jul 2019 13:45:51 +0200
+
+mintmenu (5.9.5) tina; urgency=medium
+
+  * Fix default favorites not being created
+
+ -- Clement Lefebvre <root@linuxmint.com>  Wed, 17 Jul 2019 15:49:20 +0200
+
+mintmenu (5.9.4) tina; urgency=medium
+
+  * Packaging: Add dependency on python3-xlib
+
+ -- Clement Lefebvre <root@linuxmint.com>  Wed, 17 Jul 2019 11:38:44 +0200
+
+mintmenu (5.9.3) tina; urgency=medium
+
+  * Applications: Port to GI MateMenu
+
+ -- Clement Lefebvre <root@linuxmint.com>  Fri, 05 Jul 2019 11:32:04 +0200
+
+mintmenu (5.9.2) tina; urgency=medium
+
+  [ gm10 ]
+  * Places: Don't hardcode file browser (#204)
+  * Applications: Fix keypress event handler (#205)
+
+  [ Andrew ]
+  * Fix broke running with "xdg-su" in exec field (#200)
+
+  [ gm10 ]
+  * Assorted cleanup, fixes and performance improvements (#206)
+  * keybinding: Remove left-over debug messages (#213)
+  * Change makepot to parse .glade files (#210)
+  * Clean up i18n, remove unnecessary duplication
+
+  [ Clement Lefebvre ]
+  * Fix msgids and glade files
+
+  [ gm10 ]
+  * Applications.py: Clean up more whitespace and line lengths
+  * remove unused variables from favoritesBuildLauncher
+  * Preferences: Fix deprecated alignment parameters (#219)
+  * Applications: Remove Search label (#217)
+  * Applications: Replace deprecated xpad/ypad with margin-XYZ parameters (#218)
+  * Applications: Replace the deprecated icon for adding packages (#216)
+  * Preferences: Change "recent documents" to "recently used applications and documents" plugin (#215)
+  * Preferences: Normalize margins/alignment/layout between tabs (#220)
+
+  [ Clement Lefebvre ]
+  * About: Fix the path for mintcommon's version.py
+  * Inject the app version during the build
+  * Configuration screen: Fix alignmnents and margins
+  * Applications: Categories column always use natural width
+  * Fix tooltips and make them optional, remove category tooltips in apps
+  * Add option to show search bar on top
+  * l10n: Update POT
+  * Revamp preferences
+  * Fix l10n
+  * Recent: Move documents to the left
+  * Remove obsolete code
+  * Preferences: Fix support for low resolutions
+  * Applet icon: Add support for icon names
+
+ -- Clement Lefebvre <root@linuxmint.com>  Sun, 30 Jun 2019 15:44:01 +0200
+
+mintmenu (5.9.1) tessa; urgency=medium
+
+  * Change default menu icon
+
+ -- Clement Lefebvre <root@linuxmint.com>  Fri, 30 Nov 2018 20:17:38 +0000
+
+mintmenu (5.9.0) tara; urgency=medium
+
+  * Packaging: Don't force dependency on MATE 1.18+
+
+ -- Clement Lefebvre <root@linuxmint.com>  Sun, 08 Jul 2018 16:00:34 +0200
+
+mintmenu (5.8.9) tara; urgency=medium
+
+  * Fix RecentHelper spam in logs
+
+ -- Clement Lefebvre <root@linuxmint.com>  Fri, 08 Jun 2018 12:21:24 +0100
+
+mintmenu (5.8.8) tara; urgency=medium
+
+  [ Victor Kareh ]
+  * Support correct widget sizes for HiDPI displays
+  * Fix menu positioning to account for multiple monitors (#24)
+
+  [ Clement Lefebvre ]
+  * Don't set window decorations
+
+ -- Clement Lefebvre <root@linuxmint.com>  Thu, 31 May 2018 13:53:53 +0100
+
+mintmenu (5.8.7) tara; urgency=medium
+
+  [ monsta ]
+  * add missing deps on python-apt and python-configobj (#193)
+
+ -- Clement Lefebvre <root@linuxmint.com>  Wed, 30 May 2018 18:20:21 +0100
+
+mintmenu (5.8.6) tara; urgency=medium
+
+  * Favorites: Remove pidgin, add pix, fix gnome-calculator..
+
+ -- Clement Lefebvre <root@linuxmint.com>  Tue, 15 May 2018 15:13:59 +0100
+
+mintmenu (5.8.5) tara; urgency=medium
+
+  [ Vincent Vermeulen ]
+  * safe apt search with shell escapes (#190)
+  * Highlight previous search so typing overwrites it (#191)
+
+  [ Clement Lefebvre ]
+  * mint-remove-application: Don't use gksu
+
+ -- Clement Lefebvre <root@linuxmint.com>  Mon, 07 May 2018 12:26:50 +0100
+
+mintmenu (5.8.4) sylvia; urgency=medium
+
+  * Don't run mintinstall as root
+
+ -- Clement Lefebvre <root@linuxmint.com>  Sun, 12 Nov 2017 14:33:53 +0000
+
+mintmenu (5.8.3) sylvia; urgency=medium
+
+  [ Leigh Scott ]
+  * fix indent (#183)
+
+  [ wesdawg ]
+  * Search updates (#185)
+
+  [ Hrotkó Gábor ]
+  * Show recently used apps (#167)
+
+ -- Clement Lefebvre <root@linuxmint.com>  Sat, 11 Nov 2017 09:00:30 +0000
+
+mintmenu (5.8.2) sonya; urgency=medium
+
+  * Recent: Expand plugin to fill empty space
+
+ -- Clement Lefebvre <root@linuxmint.com>  Tue, 27 Jun 2017 10:02:19 +0200
+
+mintmenu (5.8.1) sonya; urgency=medium
+
+  [ monsta ]
+  * applications: don't spam system log with system tools names (#177)
+
+  [ Clement Lefebvre ]
+  * Add exception handling around pointer monitor
+  * Add exception handling around keybinder
+
+  [ monsta ]
+  * build: add build-dep on dh-python to fix build warning (#179)
+
+ -- Clement Lefebvre <root@linuxmint.com>  Mon, 12 Jun 2017 15:54:53 +0100
+
+mintmenu (5.8.0) sonya; urgency=medium
+
+  [ Alexei Sorokin ]
+  * Use the Gtk3 bookmarks location (#174)
+
+  [ Clement Lefebvre ]
+  * Places: Explicitly import GLib
+  * l10n: Update POT file
+
+ -- Clement Lefebvre <root@linuxmint.com>  Sat, 06 May 2017 16:18:18 +0100
+
+mintmenu (5.7.9) sonya; urgency=medium
+
+  [ monsta ]
+  * build: fix dependencies for GTK+3
+  * build: depend on GI packages of MATE >= 1.18.0
+  * build: remove dependencies on C libs of MATE
+  * fix menu crash when placed on left vertical panel
+  * easybuttons: fix runtime warning about missing MateDesktop version
+
+  [ Victor Kareh ]
+  * Fix windows-key global keybinding. (#172)
+
+ -- Clement Lefebvre <root@linuxmint.com>  Fri, 05 May 2017 16:10:29 +0100
+
+mintmenu (5.7.8) sonya; urgency=medium
+
+  [ JosephMcc ]
+  * Remove the ability to set a custom border
+
+  [ Clement Lefebvre ]
+  * Fix launching apps which use su-to-root
+
+ -- Clement Lefebvre <root@linuxmint.com>  Tue, 02 May 2017 13:10:32 +0100
+
+mintmenu (5.7.7) sonya; urgency=medium
+
+  [ leigh123linux ]
+  * gtk3
+  * glade part #1
+  * glade part #2
+  * glade part #3
+  * fix errors
+  * fix some glade typos
+  * fix border colour
+
+  [ Clement Lefebvre ]
+  * Remove more ctypes
+  * Fix get_origin calls in Betsy
+  * Fix keybinding in LMDE
+  * Fix unknown variable name
+  * Fix popup menus
+  * Fix DND in favorites
+  * Fix add to desktop
+  * Fix empty trash popup
+  * Removed obsolete opacity support in config window
+  * [Alexei Sorokin] Recent: Fix Gtk warnings
+  * Fix race condition with dconf on session start
+  * Fix #157
+  * Fix typo in debian/control
+
+  [ JosephMcc ]
+  * Don't ignore icons from /usr/share/pixmaps
+
+  [ Clement Lefebvre ]
+  * Give the applet box a class name to allow easier themeing
+
+ -- Clement Lefebvre <root@linuxmint.com>  Mon, 01 May 2017 19:50:14 +0100
+
+mintmenu (5.7.6) serena; urgency=medium
+
+  * Reorganize imports
+  * Use setproctitle to name the process
+  * Add Cinnamon support
+
+ -- Clement Lefebvre <root@linuxmint.com>  Wed, 07 Dec 2016 09:24:58 +0000
+
+mintmenu (5.7.5) serena; urgency=medium
+
+  * Favorites: Add rhythmbox
+
+ -- Clement Lefebvre <root@linuxmint.com>  Wed, 23 Nov 2016 22:49:47 +0000
+
+mintmenu (5.7.4) serena; urgency=medium
+
+  [ JKAbrams ]
+  * Added setting to disable internet searching
+  * Revert "Added setting to disable internet searching"
+  * Making internet searching from the start menu optional
+
+  [ Clement Lefebvre ]
+  * Search engines: Replace Google CSE with DDG
+  * Search engines: Re-enable search engines by default.
+  * Search engines: Fix community links when Internet search is disabled
+  * l10n: Capitalize "Internet"
+  * Search engines: Point to local version of Wikipedia
+  * l10n: Update POT file
+
+ -- Clement Lefebvre <root@linuxmint.com>  Wed, 23 Nov 2016 15:37:46 +0000
+
+mintmenu (5.7.3) serena; urgency=medium
+
+  * Fixed launching some Wine applications
+
+ -- Clement Lefebvre <root@linuxmint.com>  Wed, 02 Nov 2016 14:03:20 +0000
+
+mintmenu (5.7.2) sarah; urgency=medium
+
+  * Menu icon: Scale svg files to 22px to prevent them from getting too big
+
+ -- Clement Lefebvre <root@linuxmint.com>  Wed, 22 Jun 2016 15:51:41 +0100
+
+mintmenu (5.7.1) sarah; urgency=medium
+
+  * Deleted trailing spaces in gsettings schema
+  * Changed default for use-custom-color to False
+  * Removed support for opacity
+
+ -- Clement Lefebvre <root@linuxmint.com>  Tue, 21 Jun 2016 17:42:01 +0100
+
+mintmenu (5.7.0) sarah; urgency=medium
+
+  * System: Use pkexec for synaptic
+
+ -- Clement Lefebvre <root@linuxmint.com>  Mon, 06 Jun 2016 10:56:21 +0100
+
+mintmenu (5.6.9) sarah; urgency=medium
+
+  * Fixed indentation and trailing spaces
+  * Clean up and add debugging info
+  * Refresh the apps on icon-theme-changed
+
+ -- Clement Lefebvre <root@linuxmint.com>  Sat, 21 May 2016 18:40:09 +0100
+
+mintmenu (5.6.8) sarah; urgency=medium
+
+  * Favorites: Replace gedit/pluma with xed
+
+ -- Clement Lefebvre <root@linuxmint.com>  Wed, 18 May 2016 10:26:09 +0100
+
+mintmenu (5.6.7) sarah; urgency=medium
+
+  [ Clement Lefebvre ]
+  * Don't refer to /usr/lib/linuxmint/mintInstall/icon.svg
+  * Fixed applet icon missing in Add-New-Applet dialog
+
+  [ Sorokin Alexei ]
+  * Fix crash on Gtk 2.24.29+
+
+  [ Benjamin L. Campbell ]
+  * applications plugin: Launch first application matching search on ENTER keypress.
+  * Fix space behavior.
+
+ -- Clement Lefebvre <root@linuxmint.com>  Thu, 21 Apr 2016 17:21:47 +0100
+
+mintmenu (5.6.6) rosa; urgency=medium
+
+  * Remove window titlebar (some metacity themes insist on showing a titlebar..)
+
+ -- Clement Lefebvre <root@linuxmint.com>  Wed, 16 Dec 2015 11:39:07 +0000
+
+mintmenu (5.6.5) rosa; urgency=medium
+
+  [ James Lu ]
+  * Coerse shebangs to #!/usr/bin/python2
+
+  [ Maxime-J ]
+  * Localized Desktop folder fix
+
+  [ Chromatic Dragon ]
+  * Changes to support 64-bit pointers passing the C-python interface. This fixes recent problems encountered on systems using python2 compiled with the PIE option set.
+
+  [ Clement Lefebvre ]
+  * Little improvements in system dir detection
+  * Add a frame around the menu
+  * Fine-tuned border widths and padding
+
+ -- Clement Lefebvre <root@linuxmint.com>  Fri, 06 Nov 2015 16:32:31 +0000
+
+mintmenu (5.6.4) rafaela; urgency=medium
+
+  * Fixed ubiquity not launching from mintmenu
+
+ -- Clement Lefebvre <root@linuxmint.com>  Sun, 14 Jun 2015 13:37:26 +0200
+
+mintmenu (5.6.3) rafaela; urgency=medium
+
+  [ James Lu ]
+  * Sort available themes in Menu preferences->Theme
+
+  [ Clement Lefebvre ]
+  * Changed default settings to make mintMenu a little better looking
+
+ -- Clement Lefebvre <root@linuxmint.com>  Fri, 12 Jun 2015 16:39:01 +0200
+
+mintmenu (5.6.2) betsy; urgency=medium
+
+  * Added gnome-system-monitor to list of favorites
+
+ -- Clement Lefebvre <root@linuxmint.com>  Thu, 26 Feb 2015 19:35:24 +0100
+
+mintmenu (5.6.1) betsy; urgency=medium
+
+  [ monsta ]
+  * removed unused stuff
+  * mintMenuConfig: make Plugins tab title translatable
+  * makepot: removed obsolete mintRemove reference
+  * updated potfile
+  * removed unused and confusing argument
+  * properly create a desktop shortcut from a menu entry
+  * fixed wrong indentation
+  * no need to import the same thing twice
+  * fixed saving old config in RegenPlugin
+  * fixed wrong indentation again
+
+  [ darealshinji ]
+  * add a help command line option
+  * install a manpage
+  * override image-file-in-usr-lib warnings
+
+  [ Clement Lefebvre ]
+  * Don't pass env variable value through bash echo
+  * Favorites: replaces obsolete mate-calc with gnome-calculator
+
+ -- Clement Lefebvre <root@linuxmint.com>  Tue, 24 Feb 2015 14:45:24 +0100
+
+mintmenu (5.6.0) rebecca; urgency=medium
+
+  * Fixed bookmarks with quotes not opening properly
+
+ -- Clement Lefebvre <root@linuxmint.com>  Sat, 08 Nov 2014 17:55:32 +0100
+
+mintmenu (5.5.9) rebecca; urgency=medium
+
+  * Use /usr/bin/python always
+  * Escape ampersand in app names and comments
+  * Removed mintRemove.py (re-added by mistake in last merge)
+  * Fixed a typo which led to loading non-localized string
+
+ -- Clement Lefebvre <root@linuxmint.com>  Tue, 30 Sep 2014 13:19:55 +0200
+
+mintmenu (5.5.8) qiana; urgency=medium
+
+  * 5.5.8
+
+ -- Clement Lefebvre <root@linuxmint.com>  Sun, 25 May 2014 14:19:20 +0100
+
+mintmenu (5.5.7) qiana; urgency=medium
+
+  * 5.5.7
+
+ -- Clement Lefebvre <root@linuxmint.com>  Thu, 22 May 2014 11:44:15 +0100
+
+mintmenu (5.5.6) qiana; urgency=medium
+
+  * 5.5.6
+
+ -- Clement Lefebvre <root@linuxmint.com>  Thu, 22 May 2014 10:59:40 +0100
+
+mintmenu (5.5.5) qiana; urgency=medium
+
+  * 5.5.5
+
+ -- Clement Lefebvre <root@linuxmint.com>  Tue, 06 May 2014 15:04:09 +0100
+
+mintmenu (5.5.4) qiana; urgency=medium
+
+  * 5.5.4
+
+ -- Clement Lefebvre <root@linuxmint.com>  Tue, 06 May 2014 10:17:37 +0100
+
+mintmenu (5.5.3) qiana; urgency=medium
+
+  * 5.5.3
+
+ -- Clement Lefebvre <root@linuxmint.com>  Mon, 14 Apr 2014 13:31:07 +0100
+
+mintmenu (5.5.2) debian; urgency=low
+
+  * 5.5.2
+
+ -- Clement Lefebvre <root@linuxmint.com>  Tue, 18 Mar 2014 11:50:05 +0000
+
+mintmenu (5.5.1) petra; urgency=low
+
+  * 5.5.1
+
+ -- Clement Lefebvre <root@linuxmint.com>  Thu, 30 Jan 2014 10:43:05 +0000
+
+mintmenu (5.5.0) petra; urgency=low
+
+  * 5.5.0
+
+ -- Clement Lefebvre <root@linuxmint.com>  Mon, 25 Nov 2013 16:08:12 +0000
+
+mintmenu (5.4.9) olivia; urgency=low
+
+  * 5.4.9
+
+ -- Clement Lefebvre <root@linuxmint.com>  Tue, 21 May 2013 21:29:14 +0100
+
+mintmenu (5.4.8) olivia; urgency=low
+
+  * 5.4.8
+
+ -- Clement Lefebvre <root@linuxmint.com>  Tue, 21 May 2013 11:02:40 +0100
+
+mintmenu (5.4.7) olivia; urgency=low
+
+  * 5.4.7
+
+ -- Clement Lefebvre <root@linuxmint.com>  Thu, 09 May 2013 11:05:40 +0100
+
+mintmenu (5.4.6) olivia; urgency=low
+
+  * 5.4.6
+
+ -- Clement Lefebvre <root@linuxmint.com>  Tue, 07 May 2013 12:53:46 +0100
+
+mintmenu (5.4.5) olivia; urgency=low
+
+  * 5.4.5
+
+ -- Clement Lefebvre <root@linuxmint.com>  Tue, 07 May 2013 12:37:07 +0100
+
+mintmenu (5.4.4) olivia; urgency=low
+
+  * 5.4.4
+
+ -- Clement Lefebvre <root@linuxmint.com>  Fri, 03 May 2013 15:00:27 +0100
+
+mintmenu (5.4.3) olivia; urgency=low
+
+  * 5.4.3
+
+ -- Clement Lefebvre <root@linuxmint.com>  Thu, 02 May 2013 20:08:17 +0100
+
+mintmenu (5.4.2) olivia; urgency=low
+
+  * 5.4.2
+
+ -- Clement Lefebvre <root@linuxmint.com>  Thu, 25 Apr 2013 20:37:19 +0100
+
+mintmenu (5.4.1) olivia; urgency=low
+
+  * Multiple fixes post MATE 1.6 migration
+
+ -- Clement Lefebvre <root@linuxmint.com>  Mon, 08 Apr 2013 11:46:11 +0100
+
+mintmenu (5.4.0) olivia; urgency=low
+
+  * Fixed icons regression in 5.3.9
+
+ -- Clement Lefebvre <root@linuxmint.com>  Wed, 13 Mar 2013 14:01:01 +0000
+
+mintmenu (5.3.9) olivia; urgency=low
+
+  * Migration to MATE 1.6
+
+ -- Clement Lefebvre <root@linuxmint.com>  Tue, 12 Mar 2013 16:14:03 +0000
+
+mintmenu (5.3.8) nadia; urgency=low
+
+  * Launch mintinstall as root
+
+ -- Clement Lefebvre <root@linuxmint.com>  Fri, 02 Nov 2012 15:00:53 +0000
+
+mintmenu (5.3.7) maya; urgency=low
+
+  * Added missing dependencies
+  * Added XFCE favorites
+
+ -- Clement Lefebvre <root@linuxmint.com>  Thu, 28 Jun 2012 13:02:20 +0100
+
+mintmenu (5.3.6) maya; urgency=low
+
+  * Fixed typo on "Lookup Dictionnary"
+
+ -- Clement Lefebvre <root@linuxmint.com>  Thu, 28 Jun 2012 12:14:31 +0100
+
+mintmenu (5.3.5) maya; urgency=low
+
+  * Fixed terminal and desktop icons
+
+ -- Clement Lefebvre <root@linuxmint.com>  Tue, 22 May 2012 16:42:57 +0100
+
+mintmenu (5.3.4) maya; urgency=low
+
+  * Limit number of APT suggestions to 3
+
+ -- Clement Lefebvre <root@linuxmint.com>  Fri, 18 May 2012 13:16:51 +0100
+
+mintmenu (5.3.3) maya; urgency=low
+
+  * Use apturl directly if it's installed (instead of relying on MIME types being properly assigned)
+
+ -- Clement Lefebvre <root@linuxmint.com>  Wed, 09 May 2012 13:49:19 +0100
+
+mintmenu (5.3.2) maya; urgency=low
+
+  * Call mate-screensaver-command instead of xdg-screensaver in MATE
+
+ -- Clement Lefebvre <root@linuxmint.com>  Wed, 18 Apr 2012 11:03:54 +0100
+
+mintmenu (5.3.1) maya; urgency=low
+
+  * Monitor MATE menu files for changes instead of GNOME ones
+
+ -- Clement Lefebvre <root@linuxmint.com>  Wed, 04 Apr 2012 14:38:38 +0100
+
+mintmenu (5.3.0) maya; urgency=low
+
+  * Changed gnome favs with mate alternatives
+
+ -- Clement Lefebvre <root@linuxmint.com>  Wed, 04 Apr 2012 14:19:04 +0100
+
+mintmenu (5.2.9) maya; urgency=low
+
+  * Replaced alacarte with mozo
+
+ -- Clement Lefebvre <root@linuxmint.com>  Thu, 22 Mar 2012 13:11:39 +0000
+
+mintmenu (5.2.8) lisa; urgency=low
+
+  * Fixed "Add to panel" in applications plugin
+
+ -- Clement Lefebvre <root@linuxmint.com>  Thu, 01 Dec 2011 20:05:40 +0000
+
+mintmenu (5.2.7) lisa; urgency=low
+
+  * Replaced system and places shortcut in MATE to use caja and mate-terminal
+
+ -- Clement Lefebvre <root@linuxmint.com>  Mon, 28 Nov 2011 12:43:49 +0000
+
+mintmenu (5.2.6) lisa; urgency=low
+
+  * Adjusted dependencies for MATE
+
+ -- Clement Lefebvre <root@linuxmint.com>  Fri, 18 Nov 2011 17:58:00 +0000
+
+mintmenu (5.2.5) lisa; urgency=low
+
+  * Switched support from Gnome/Bonobo to Mate/MateComponent
+
+ -- Clement Lefebvre <root@linuxmint.com>  Fri, 18 Nov 2011 10:47:16 +0000
+
+mintmenu (5.2.4) katya; urgency=low
+  
+  * Improvements in Unicode support
+  
+ -- Clement Lefebvre <root@linuxmint.com>  Tue,  27 Sep 2011 14:14:00 +0000
+
+mintmenu (5.2.3) katya; urgency=low
+  
+  * Fix for applications with no comments/generic_names in favorites
+  * Get the Window manager from env(GDMSESSION)
+  * Changing the hover delay now takes effect immediately
+  * Right click menus now open on press (instead of release), which also solves some focus problems
+  * Fixed duplicate entries in the "All" category
+  
+ -- Clement Lefebvre <root@linuxmint.com>  Tue,  27 Sep 2011 13:55:00 +0000
+
+mintmenu (5.2.2) katya; urgency=low
+  
+  * Compatibility with new Mint-X-Theme (dropped embedded gtk.Separator in Event boxes in favorites plugin)
+  
+ -- Clement Lefebvre <root@linuxmint.com>  Mon,  30 May 2011 16:00:00 +0000
+
+mintmenu (5.2.1) katya; urgency=low
+  
+  * Bug fix, preferences now work as expected again.
+  
+ -- Clement Lefebvre <root@linuxmint.com>  Mon,  30 May 2011 14:30:00 +0000
+
+mintmenu (5.2.0) katya; urgency=low
+  
+  * Banshee replaces Rhythmbox in default favorites
+  * Star icon for mintInstall in system plugin
+  
+ -- Clement Lefebvre <root@linuxmint.com>  Sun,  1 May 2011 17:45:00 +0000
+
+mintmenu (5.1.9) katya; urgency=low
+  
+  * Compatible with Ubuntu 11.04 (which changed its libc.so.6 path)
+  
+ -- Clement Lefebvre <root@linuxmint.com>  Tue,  12 Apr 2011 17:43:00 +0000
+
+mintmenu (5.1.8) katya; urgency=low
+  
+  * Fixed indentation issue in recent documents plugin
+  
+ -- Clement Lefebvre <root@linuxmint.com>  Wed,  30 Mar 2011 19:01:00 +0000
+
+mintmenu (5.1.7) katya; urgency=low
+  
+  * Added support for Xfce
+  
+ -- Clement Lefebvre <root@linuxmint.com>  Tue,  29 Mar 2011 19:52:00 +0000
+
+mintmenu (5.1.6) julia; urgency=low
+
+  * Highlighted apps now appear in bold, as opposed to using the fg[gtk.SELECTED] color (to avoid white on white issues with certain themes)
+  * Network icon in places uses "network-workgroup" icon name when the theme is not Mint-X.
+  
+ -- Clement Lefebvre <root@linuxmint.com>  Tue,  26 Oct 2010 14:44:00 +0000
+
+mintmenu (5.1.5) julia; urgency=low
+
+  * Faster initialization
+  * Fixed memory leak
+  * Faster APT search
+  * APT search results now include packages which summary or description match the keywords
+  * APT search results: packages which name match the keywords are placed at the top of the list
+  * Fixed process name on 64-bit platforms
+  * Menu now properly redraws itself when theme is changed
+  
+ -- Clement Lefebvre <root@linuxmint.com>  Tue,  26 Oct 2010 12:00:00 +0000
+
+mintmenu (5.1.4) julia; urgency=low
+
+  * Unicode support in GTK bookmarks
+  
+ -- Clement Lefebvre <root@linuxmint.com>  Mon,  25 Oct 2010 12:22:00 +0000
+
+mintmenu (5.1.3) julia; urgency=low
+
+  * APT search can be turned off
+  
+ -- Clement Lefebvre <root@linuxmint.com>  Fri,  24 Sep 2010 14:52:00 +0000
+
+mintmenu (5.1.2) julia; urgency=low
+
+  * Many UI improvements
+  
+ -- Clement Lefebvre <root@linuxmint.com>  Thu,  23 Sep 2010 18:37:00 +0000
+
+mintmenu (5.1.1) julia; urgency=low
+
+  * Fixed launching apps with quotes
+  
+ -- Clement Lefebvre <root@linuxmint.com>  Thu,  23 Sep 2010 11:29:00 +0000
+
+mintmenu (5.1.0) julia; urgency=low
+
+  * Added GTK bookmarks in places
+  
+ -- Clement Lefebvre <root@linuxmint.com>  Thu,  23 Sep 2010 09:54:00 +0000
+ 
+mintmenu (5.0.9) julia; urgency=low
+
+  * Added GTK RC name to mintmenu (allows GTK themes to have mintMenu specific sections)
+  
+ -- Clement Lefebvre <root@linuxmint.com>  Fri,  17 Sep 2010 14:54:00 +0000
+
+mintmenu (5.0.8) julia; urgency=low
+
+  * Added GTK Themes support and configuration
+  
+ -- Clement Lefebvre <root@linuxmint.com>  Wed,  15 Sep 2010 17:11:00 +0000
+
+mintmenu (5.0.7) julia; urgency=low
+
+  * Fixed called to HidePlugin
+  
+ -- Clement Lefebvre <root@linuxmint.com>  Mon,  13 Sep 2010 16:57:00 +0000
+
+mintmenu (5.0.6) julia; urgency=low
+
+  * Removed sidepane (confusing), plugins are now enabled/disabled in preferences  
+  * UI improvements (dotted separators, layout)
+  * 150ms default hover delay
+  * Fixed empty application list bug
+  * Fixed mouse grab issue
+  * Highlights newly installed applications
+  
+ -- Clement Lefebvre <root@linuxmint.com>  Mon,  13 Sep 2010 12:09:00 +0000
+
+mintmenu (5.0.5) julia; urgency=low
+
+  * Multi-threaded search
+  * Multiple keywords search
+  * Fixed grab focus bugs
+  
+ -- Clement Lefebvre <root@linuxmint.com>  Sun,  12 Sep 2010 12:21:00 +0000
+
+mintmenu (5.0.4) julia; urgency=low
+
+  * Don't break menu if apt fails to initialize
+  
+ -- Clement Lefebvre <root@linuxmint.com>  Fri,  10 Sep 2010 13:34:00 +0000
+
+mintmenu (5.0.3) julia; urgency=low
+
+  * Fixed separators colors in search results
+  
+ -- Clement Lefebvre <root@linuxmint.com>  Fri,  10 Sep 2010 10:41:00 +0000
+
+mintmenu (5.0.2) julia; urgency=low
+
+  * Fixed space chars in computer search
+  * Fixed focus problems with search entry and search menu
+
+ -- Clement Lefebvre <root@linuxmint.com>  Tue,  07 Sep 2010 18:28:00 +0000
+
+mintmenu (5.0.1) julia; urgency=low
+
+  * Added search engines to mintMenu
+
+ -- Clement Lefebvre <root@linuxmint.com>  Mon,  06 Sep 2010 21:55:00 +0000
+
+mintmenu (5.0.0) julia; urgency=low
+
+  * Filtering now uses APT to fetch results and apturl to install packages
+
+ -- Clement Lefebvre <root@linuxmint.com>  Mon,  06 Sep 2010 15:21:00 +0000
+
+mintmenu (4.9.9) isadora; urgency=low
+
+  * Custom places: now understands ~ signs and listens to changes in the path
+
+ -- Clement Lefebvre <root@linuxmint.com>  Sun,  09 May 2010 11:51:00 +0000
+
+mintmenu (4.9.8) isadora; urgency=low
+
+  * Removed suggestion "search in portal"
+
+ -- Clement Lefebvre <root@linuxmint.com>  Sat,  01 May 2010 13:07:00 +0000
+
+mintmenu (4.9.7) isadora; urgency=low
+
+  * Imported fixes from icius on editing favorites
+
+ -- Clement Lefebvre <root@linuxmint.com>  Tue,  27 Apr 2010 08:37:00 +0000
+
+mintmenu (4.9.6) isadora; urgency=low
+
+  * Fixed drag and drop from favorites
+
+ -- Clement Lefebvre <root@linuxmint.com>  Thur,  1 Apr 2010 11:40:00 +0000
+
+mintmenu (4.9.5) isadora; urgency=low
+
+  * Add to panel
+  * Add to desktop
+  * Edit properties
+  * Delete from menu
+  * Better properties layout
+  * Fixed label orientation
+  * New option: start with favorites
+  * Transparency option
+
+ -- Clement Lefebvre <root@linuxmint.com>  Mon,  22 Mar 2010 19:47:00 +0000
+
+mintmenu (4.9.4) helena; urgency=low
+
+  * Fixed: spaces in custom places and/or desktop directory
+
+ -- Clement Lefebvre <root@linuxmint.com>  Sun,  3 Jan 2009 12:50:00 +0000
+
+mintmenu (4.9.3) helena; urgency=low
+
+  * Fixed: https://bugs.launchpad.net/linuxmint/+bug/496730
+
+ -- Clement Lefebvre <root@linuxmint.com>  Tue,  15 Dec 2009 11:27:00 +0000
+
+mintmenu (4.9.2) helena; urgency=low
+
+  * Fixed: https://bugs.launchpad.net/mintmenu/+bug/490174
+
+ -- Clement Lefebvre <root@linuxmint.com>  Mon,  14 Dec 2009 15:14:00 +0000
+
+mintmenu (4.9.1) helena; urgency=low
+
+  * Split Others, Administration and System tools categories (if we do it again we have to patch Alacarte to reflect this)
+  * Improved gmenu detection (didn't detect applications in sub-categories)
+  * Added dependency on python-gnomeapplet, needed by mintmenu
+
+ -- Clement Lefebvre <root@linuxmint.com>  Mon,  30 Nov 2009 14:59:00 +0000
+
+mintmenu (4.9.0) helena; urgency=low
+
+  * Changed hover delay from 150 to 50ms
+
+ -- Clement Lefebvre <root@linuxmint.com>  Fri,  27 Nov 2009 14:59:00 +0000
+
+mintmenu (4.8.9) helena; urgency=low
+
+  * Inverted labels between name and path in the edit places dialog in preferences
+
+ -- Clement Lefebvre <root@linuxmint.com>  Thu,  19 Nov 2009 16:07:00 +0000
+
+mintmenu (4.8.8) helena; urgency=low
+
+  * Reinstated calls to mouse grabs (needed to hide the menu when desktop is clicked) and added a call to hide_window (found in USP)
+
+ -- Clement Lefebvre <root@linuxmint.com>  Thu,  19 Nov 2009 09:44:00 +0000
+
+mintmenu (4.8.7) helena; urgency=low
+
+  * Replaced xdg with gmenu (Fixes broken Games category)
+  * Removed calls to mouse grabs (Could fix weird bug about not being able to grab the mouse)
+  * Made Pidgin a favorite in replacement of Xchat
+  * Hover menu icon now uses pygtk to brighten the chosen picture: Fixes problem with custom menu icons
+
+ -- Clement Lefebvre <root@linuxmint.com>  Thu,  19 Nov 2009 08:52:00 +0000
+
+mintmenu (4.8.6) helena; urgency=low
+
+  * Fixed missing i18n
+
+ -- Clement Lefebvre <root@linuxmint.com>  Tue,  17 Nov 2009 12:06:00 +0000
+
+mintmenu (4.8.5) helena; urgency=low
+
+  * Mint logo by default
+  * Mouse over the logo and it highlights
+  * Fixed highlight issue with buttons
+  * Fixed case incoherence in system items
+
+ -- Clement Lefebvre <root@linuxmint.com>  Fri,  6 Nov 2009 13:47:00 +0000
+
+mintmenu (4.8.4) helena; urgency=low
+
+  * Changed translation framework
+
+ -- Clement Lefebvre <root@linuxmint.com>  Tue,  3 Nov 2009 11:27:00 +0000
+
+mintmenu (4.8.3) helena; urgency=low
+
+  * Added latest changes from chlodapp
+
+ -- Clement Lefebvre <root@linuxmint.com>  Mon,  2 Nov 2009 18:19:00 +0000
+
+mintmenu (4.8.2) helena; urgency=low
+
+  * Changed default favorites
+
+ -- Clement Lefebvre <root@linuxmint.com>  Fri,  30 Oct 2009 18:21:00 +0000
+
+mintmenu (4.8.1) helena; urgency=low
+
+  * Dependency on mint-common
+  * Updated calls to newer pyinotify API
+  * Updated path of keybinder API
+  * Removed dependency on mintinstall
+
+ -- Clement Lefebvre <root@linuxmint.com>  Thu,  8 Oct 2009 10:26:00 +0000
+
+mintmenu (4.8.0) helena; urgency=low
+
+  * Blueprint implemented: https://blueprints.launchpad.net/linuxmint/+spec/generic-branding
+
+ -- Clement Lefebvre <root@linuxmint.com>  Wed,  29 Jul 2009 22:48:00 +0000
+
+mintmenu (4.7.9) gloria; urgency=low
+
+  * Fix: Hitting enter on search does nothing (https://bugs.launchpad.net/bugs/399990)
+
+ -- Clement Lefebvre <root@linuxmint.com>  Thu,  16 Jul 2009 16:02:00 +0000
+
+mintmenu (4.7.8) gloria; urgency=low
+
+  * Fix: launching terminal=true applications (example: htop)
+
+ -- Clement Lefebvre <root@linuxmint.com>  Fri,  19 Jun 2009 10:27:00 +0000
+
+mintmenu (4.7.7) gloria; urgency=low
+
+  * Updated translations
+
+ -- Clement Lefebvre <root@linuxmint.com>  Thu,  18 Jun 2009 12:38:00 +0000
+
+mintmenu (4.7.6) gloria; urgency=low
+
+  * Updated translations
+
+ -- Clement Lefebvre <root@linuxmint.com>  Tue,  19 May 2009 18:16:00 +0000
+
+mintmenu (4.7.5) gloria; urgency=low
+
+  * Updated translations
+
+ -- Clement Lefebvre <root@linuxmint.com>  Mon,  18 May 2009 19:12:00 +0000
+
+mintmenu (4.7.4) gloria; urgency=low
+
+  * Removed initial call to refreshTrash() in plugins/places.py, suspected to cause regression with Gnome Trash
+
+ -- Clement Lefebvre <root@linuxmint.com>  Mon,  18 May 2009 20:15:00 +0000
+
+mintmenu (4.7.3) gloria; urgency=low
+
+  * Updated translations
+
+ -- Clement Lefebvre <root@linuxmint.com>  Sun,  17 May 2009 19:52:00 +0000
+
+mintmenu (4.7.2) gloria; urgency=low
+
+  * Added translations
+
+ -- Clement Lefebvre <root@linuxmint.com>  Sun,  17 May 2009 18:56:00 +0000
+
+mintmenu (4.7.1) gloria; urgency=low
+
+  * Now opens x-terminal-emulator instead of calling gnome-terminal directly
+  * Changed default key shortcut from Super_L to <Control>Super_L
+  * Added "clean" option to the "mintmenu" command
+
+ -- Clement Lefebvre <root@linuxmint.com>  Wed,  13 May 2009 20:30:00 +0000
+
+mintmenu (4.7) gloria; urgency=low
+
+  * Fixed bug in mintMenuConfig.glade regarding blocked sliders
+  * Fixed bug in places.py regarding localized desktop folders
+  * Default config: show applications comments enabled
+
+ -- Clement Lefebvre <root@linuxmint.com>  Fri,  1 May 2009 17:36:00 +0000
+
+mintmenu (4.6) gloria; urgency=low
+
+  * Externalized keybinder.so as a dependency to deskbar-applet to keep mintmenu platform-agnostic
+
+ -- Clement Lefebvre <root@linuxmint.com>  Mon,  27 Apr 2009 23:17:00 +0000
+
+mintmenu (4.5) gloria; urgency=low
+
+  * Better exception handling while showing GPL in about dialog
+
+ -- Clement Lefebvre <root@linuxmint.com>  Wed,  22 Apr 2009 17:55:00 +0000
+
+mintmenu (4.4) gloria; urgency=low
+
+  * Version in about dialog now comes from mint-apt-version
+  * Exception handling added when GPL is gotten from mintsystem
+  * Changed shortcut to mintInstall to accomodate changes and run it as root
+
+ -- Clement Lefebvre <root@linuxmint.com>  Tue,  21 Apr 2009 01:01:00 +0000
+
+mintmenu (4.3.5) gloria; urgency=low
+
+  * Fixed dependencies on mint-search-portal
+
+ -- Clement Lefebvre <root@linuxmint.com>  Thu,  26 Mar 2009 17:42:00 +0000
+
+mintmenu (4.3.4) gloria; urgency=low
+
+  * Added suggestions feature
+
+ -- Clement Lefebvre <root@linuxmint.com>  Tue,  17 Mar 2009 12:10:00 +0000
+
+mintmenu (4.3.3) gloria; urgency=low
+
+  * Menu now hides itself if Escape or Super_L keys are pressed
+  * New global keyboard shortcut to access the menu (Super_L by default)
+  * Added an entry for the global shortcut in the preferences window. Menu needs to be restarted for the change to take effect.
+  * /usr/bin/mintmenu shortcut to /usr/lib/linuxmint/mintMenu.py run-in-window
+
+ -- Clement Lefebvre <root@linuxmint.com>  Sun,  8 Mar 2009 17:21:00 +0000
+
+mintmenu (4.3.2) gloria; urgency=low
+
+  * New 'Suggestions' feature when filtering yields no results
+  * Pre-filled favorites
+
+ -- Clement Lefebvre <root@linuxmint.com>  Sun,  8 Mar 2009 12:20:00 +0000
+
+mintmenu (4.3.1) gloria; urgency=low
+
+  * Right click option to empty trash
+  * Trash icon indicates whether trash is empty or not
+
+ -- Clement Lefebvre <root@linuxmint.com>  Wed,  11 Feb 2009 13:42:00 +0000
+
+mintmenu (4.2.2) felicia; urgency=low
+
+  * Added tooltip for the button which shows description from /etc/linuxmint/info
+
+ -- Clement Lefebvre <root@linuxmint.com>  Mon,  12 Jan 2009 14:57:00 +0000
+
+mintmenu (4.2.1) felicia; urgency=low
+
+  * Added new translations
+
+ -- Clement Lefebvre <root@linuxmint.com>  Fri,  5 Dec 2008 23:48:00 +0000
+
+mintmenu (4.2) felicia; urgency=low
+
+  * BROKE COMPATIBILITY WITH ELYSSA (v.4.1.2 goes to Elyssa - Backport), due to changes with gnome-session in Gnome 2.24
+  * Split shutdown and logout buttons in system plugin
+  * Removed all translations due to changes in the interface
+  * Changed some icons
+  * Added version info in about dialog
+
+ -- Clement Lefebvre <root@linuxmint.com>  Mon,  27 Oct 2008 11:49:00 +0000
+
+mintmenu (4.1.2) elyssa; urgency=low
+
+  * Fix a bug which prevented CrossOver office from being launched
+  * Added translations ca cs pl tr pt_BR
+
+ -- Clement Lefebvre <root@linuxmint.com>  Mon,  20 Oct 2008 17:52:00 +0000
+
+mintmenu (4.1.1) elyssa; urgency=low
+
+  * Search ignores accentuation
+  * Added translations da  de  it  ja  nl  no  pt_PT  ro  sl
+
+ -- Clement Lefebvre <clem@linuxmint.com>  Fri,  17 Oct 2008 18:42:00 +0000
+
+mintmenu (4.1) elyssa; urgency=low
+
+  * System plugin refactored
+  * Places plugin refactored
+  * Menu button renamed to "Menu"
+  * Pongo and formatting removed from localization files
+  * MintMenu now relies on mintSystem to get common data
+  * About dialog now shows GPL licence
+  * All double capital letters were removed "All Applications", "All Categories" etc..
+  * The software portal was replaced with a software manager which launches the new mintInstall frontend
+  * The menu icon is now configurable
+  * The search command is now configurable
+
+ -- Clement Lefebvre <clem@linuxmint.com>  Tue,  14 Oct 2008 17:48:00 +0000
+
+mintmenu (4.0) elyssa; urgency=low
+
+  * MintMenu doesn't use custom colors by default
+
+ -- Clement Lefebvre <clem@linuxmint.com>  Thu,  5 Jun 2008 16:41:00 +0000
+
+mintmenu (3.9) elyssa; urgency=low
+
+  * MintMenu now refreshes if the GTK theme is changed
+
+ -- Clement Lefebvre <clem@linuxmint.com>  Thu,  5 Jun 2008 16:21:00 +0000
+
+mintmenu (3.8) elyssa; urgency=low
+
+  * Added little hack to support weird wine stuff for CrossOverOffice.
+  * removed versioning in about dialog
+
+ -- Clement Lefebvre <clem@linuxmint.com>  Thu,  5 Jun 2008 15:37:00 +0000
+
+mintmenu (3.7) elyssa; urgency=low
+
+  * Added little hack to support weird WINEPREFIX variable setting in Wine apps.
+
+ -- Clement Lefebvre <clem@linuxmint.com>  Tue,  3 Jun 2008 23:27:00 +0000
+
+mintmenu (3.6) elyssa; urgency=low
+
+  * mintMenu was reporting version 3.3 in about dialog
+
+ -- Clement Lefebvre <clem@linuxmint.com>  Sat,  17 May 2008 12:07:00 +0000
+
+mintmenu (3.5) elyssa; urgency=low
+
+  * copied over mintmenu_icon.png in plugins
+
+ -- Clement Lefebvre <clem@linuxmint.com>  Sat,  3 May 2008 17:12:00 +0000
+
+mintmenu (3.4) elyssa; urgency=low
+
+  * software portal now uses mint icon instead of distributor-logo
+
+ -- Clement Lefebvre <clem@linuxmint.com>  Thu,  1 May 2008 18:08:00 +0000
+
+mintmenu (3.3) elyssa; urgency=low
+
+  * changed button label to Elyssa
+  * removed psyco
+  * merged system tools and other into administration
+  * filter field was made smaller (in terms of height, from 30 to 25)
+  * search button removed
+  * new translation: tr
+  * corrections: pt_BR
+
+ -- Clement Lefebvre <clem@linuxmint.com>  Tue,  22 Apr 2008 22:00:00 +0000
+
+mintmenu (3.2) elyssa; urgency=low
+
+  * new translations: bg  de  el  es  fr  it  nl  no  pl  pt_BR  pt_PT  ru  sk  sv  uk
+  * uses psyco
+  * window always centers
+  * little tweak in removal process
+  * uses apt-get -s -q remove instead of apt redpends
+  * new default value for applet_icon_size is 2
+  * added applet_icon_size in config window
+  * fixed problems with "%c" in command line --> i.e. digikam
+  * little changes in bonobo server
+
+ -- Clement Lefebvre <clem@linuxmint.com>  Sun,  9 Mar 2008 21:51:00 +0000
+
+mintmenu (3.1) elyssa; urgency=low
+
+  * launch at startup
+  * less memory leaks
+  * configuration tool
+  * less delay
+  * drag and drop in favorites
+  * uninstall
+  * recent documents
+  * loads of stuff really
+
+ -- Clement Lefebvre <clem@linuxmint.com>  Wed,  16 Jan 2008 20:13:00 +0000
+
+mintmenu (3.0) daryna; urgency=low
+
+  * removed Polish translation
+
+ -- Clement Lefebvre <root@linuxmint.com>  Sat,  24 Nov 2007 01:05:00 +0000
+
+mintmenu (2.9) daryna; urgency=low
+
+  * new Polish translation
+
+ -- Clement Lefebvre <root@linuxmint.com>  Sat,  24 Nov 2007 00:38:00 +0000
+
+mintmenu (2.8) daryna; urgency=low
+
+  * replaced lock screen with software portal
+
+ -- Clement Lefebvre <root@linuxmint.com>  Thu,  25 Oct 2007 00:17:00 +0000
+
+mintmenu (2.7) daryna; urgency=low
+
+  * changed some default colors
+
+ -- Clement Lefebvre <root@linuxmint.com>  Sun,  21 Oct 2007 00:34:00 +0000
+
+mintmenu (2.6) daryna; urgency=low
+
+  * removed dependency on mintConfig
+
+ -- clem <root@linuxmint.com>  Thu,  18 Oct 2007 11:21:00 +0000
+
+mintmenu (2.5) celena; urgency=low
+
+  * changed version number to match package version
+
+ -- clem <root@linuxmint.com>  Sat,  25 Aug 2007 23:55:00 +0000
+
+mintmenu (2.4) celena; urgency=low
+
+  * changed default applet text to Celena
+
+ -- clem <root@linuxmint.com>  Sat,  25 Aug 2007 20:02:00 +0000
+
+mintmenu (2.3) cassandra; urgency=low
+
+  * don't crash when trying to load corrupted icons
+  * don't crash if a .desktop file does not exist
+  * don't crash if the user hasn't write access to ~/.linuxmint/mintMenu
+  * improved error handling: if something fails mintMenu should at least display a error message
+  * minor layout fixes
+  * hide menu after an application was launched
+  * don't lock when the menu- or preferenceseditor is launched
+  * fixed a bug that prevented internationalization from working in non development environments 
+
+ -- clem <root@linuxmint.com>  Sat,  9 Jun 2007 17:45:00 +0000
+
+mintmenu (2.2) cassandra; urgency=low
+
+  * Doesn't hang while launching applications any more
+  * alignment fixed
+  * defaults to apps if favorites are empty
+  * support for multiple mintmenus
+  * code cleanup
+
+ -- clem <root@linuxmint.com>  Tue,  15 May 2007 20:55:52 +0000 
+
+mintmenu (2.1) cassandra; urgency=low
+
+  * Drag and Drop
+  * Multiple columns in favorites
+  * Better internals, loads of fixes
+
+ -- clem <root@linuxmint.com>  Fri,  4 May 2007 12:59:45 +0000
+
+mintmenu (2.0) cassandra; urgency=low
+
+  * Icons for categories (configurable)
+  * Delay for categories mouse-over (configurable)
+  * Buttons now fill the width
+  * various bug fixes by Lars. 
+
+ -- clem <root@linuxmint.com>  Tue,  10 Apr 2007 11:05:56 +0000 
+
+mintmenu (1.11) edgy; urgency=low
+
+  * /apps/mintmenu/mintMenu_offset now works and gap is removed between panel and menu
+  * /apps/mintmenu/plugins/applications/categories_mouse_over was introduced to configure how the user browse categories
+  * only [Desktop Entry] sections are read from desktop files
+  * Fix for brasero
+
+ -- clem <root@linuxmint.com>  Thu,  22 Mar 2007 00:49:57 +0000 
+
+mintmenu (1.10) edgy; urgency=low
+
+  * applications categories now react to mouseOver
+
+ -- clem <root@linuxmint.com>  Tue,  20 Feb 2007 19:26:45 +0000
+
+mintmenu (1.9) edgy; urgency=low
+
+  * applications now translated into user's language
+  * re-introduced filtering in search textfield
+
+ -- clem <root@linuxmint.com>  Tue,  6 Feb 2007 22:44:00 +0000
+
+mintmenu (1.8) edgy; urgency=low
+
+  * mintMenu doesn't open a visible window when Gnome starts up anymore
+  * Can now search using the Return key instead of clicking the search button
+  * Searching closes the menu
+  * Searching toggles OFF the button
+  * Doesn't show favorites if there isn't any
+  * Shows all apps by default
+
+ -- clem <root@linuxmint.com>  Tue,  6 Feb 2007 13:08:00 +0000
+
+mintmenu (1.7) edgy; urgency=low
+
+  * Increased the size of apps buttons in applications plugin
+
+ -- clem <root@linuxmint.com>  Mon,  5 Feb 2007 22:23:00 +0000
+
+mintmenu (1.6) edgy; urgency=low
+
+  * Now automatically detects newly installed/removed applications
+  * Now Works with ksisen and apps with funny arguments 
+
+ -- clem <root@linuxmint.com>  Sat,  3 Feb 2007 02:20:00 +0000
+
+mintmenu (1.5) edgy; urgency=low
+
+  * Added Trash in Places plugin
+  * Fixed Preferences (now opens "gconf-editor /apps/mintMenu &")
+  * Fixed height of Places and System plugins for them to fit under Bea's theme
+
+ -- clem <root@linuxmint.com>  Tue,  30 Jan 2007 23:30:00 +0000
+
+mintmenu (1.4) edgy; urgency=low
+
+  * Added Terminal to the system plugin
+  * Changed the icon for the system plugin
+
+ -- clem <root@linuxmint.com>  Mon,  29 Jan 2007 23:45:00 +0000
+
+mintmenu (1.3) edgy; urgency=low
+
+  * Removed "recent" from the list of default plugins
+  * Fixed some items that didn't launch in applications
+
+ -- clem <root@linuxmint.com>  Sat,  27 Jan 2007 19:04:00 +0000
+
+mintmenu (1.2) edgy; urgency=low
+
+  * Fixed some items not being launchable in the "applications" plugin
+
+ -- clem <root@linuxmint.com>  Sat,  20 Jan 2007 00:36:00 +0000
+
+mintmenu (1.1) edgy; urgency=low
+
+  * Fixed a path problem in the "recent" plugin
+
+ -- clem <root@linuxmint.com>  Fri,  19 Jan 2007 21:56:00 +0000
+
+mintmenu (1.0) edgy; urgency=low
+
+  * Initial release
+
+ -- clem <root@linuxmint.com>  Fri,  19 Jan 2007 13:46:00 +0000
+
