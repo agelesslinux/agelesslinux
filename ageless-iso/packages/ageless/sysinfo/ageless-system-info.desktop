@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Ageless System Info
+GenericName=System Information
+Comment=About this computer, and the laws that want something from it
+Exec=ageless-system-info
+Icon=ageless-logo
+Terminal=false
+Categories=System;Settings;GTK;
+Keywords=about;system;info;laws;flagrant;privacy;age;vpn;

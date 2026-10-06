@@ -1,0 +1,62 @@
+#!/usr/bin/python3
+"""ageless-flagrant: per-law flagrant mode from the command line.
+
+    ageless-flagrant                 list laws and whether flagrant mode is on
+    ageless-flagrant show <id>       the fact sheet for one law
+    ageless-flagrant on <id>         install that law's flagrant package
+    ageless-flagrant off <id>        switch it back off
+
+The same catalog drives the "Laws & Flagrant mode" page of Ageless System Info.
+"""
+
+import sys
+import textwrap
+
+sys.path.insert(0, "/usr/lib/ageless/sysinfo")
+import ageless_sysinfo as ai  # noqa: E402
+
+
+def wrap(text: str, indent: str = "  ") -> str:
+    return textwrap.fill(" ".join(text.split()), width=78, initial_indent=indent,
+                         subsequent_indent=indent)
+
+
+def main(argv: list[str]) -> int:
+    laws = {law.id: law for law in ai.load_laws()}
+    if len(argv) == 1:
+        for law in laws.values():
+            mode = ("ON " if law.enabled() else "off") if law.switchable else " - "
+            print(f"[{mode}] {law.id:<10} {law.title}  ({law.jurisdiction})")
+        print("\nageless-flagrant show <id> for details; on|off <id> to switch.")
+        return 0
+    if len(argv) != 3 or argv[1] not in ("show", "on", "off"):
+        print(__doc__.strip(), file=sys.stderr)
+        return 2
+    law = laws.get(argv[2])
+    if law is None:
+        print(f"unknown law id {argv[2]!r}; known: {', '.join(laws)}", file=sys.stderr)
+        return 2
+    if argv[1] == "show":
+        print(f"{law.title}\n{law.jurisdiction}\n")
+        for label, text in (("Status", f"{law.status} (checked {law.checked})"),
+                            ("Asks", law.asks), ("Summary", law.summary),
+                            ("Capability", law.capability),
+                            ("Flagrant mode", law.flagrant_text or "n/a")):
+            print(f"{label}:\n{wrap(text)}\n")
+        print("Sources:\n" + "\n".join("  " + s for s in law.sources))
+        print("\nNot legal advice.")
+        return 0
+    if not law.switchable:
+        print(f"{law.id}: {law.flagrant_text}")
+        return 0
+    on = argv[1] == "on"
+    res = ai.run_as_root(law.command(on))
+    sys.stdout.write(res.stdout[-2000:])
+    sys.stderr.write(res.stderr[-2000:])
+    if res.returncode == 0:
+        print(f"{law.id}: flagrant mode {'on' if on else 'off'}")
+    return res.returncode
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

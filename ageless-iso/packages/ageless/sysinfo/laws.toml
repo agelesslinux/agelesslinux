@@ -1,0 +1,116 @@
+# Laws that ask something of operating systems, app stores or the software
+# people may run: the catalog behind "Laws & Flagrant mode" in Ageless System
+# Info (ageless-system-info) and the `ageless-flagrant` command.
+#
+# Each entry is a fact sheet, not legal advice. Keep entries to what the
+# sources say, date every status, and update `checked` when you re-verify.
+# Research notes: docs/laws.md.
+#
+# Fields:
+#   id, title, jurisdiction, status, checked (YYYY-MM-DD)
+#   asks        what the law asks of an operating system, app store or user
+#   summary     two or three plain sentences
+#   sources     URLs, primary first
+#   capability  the kind of software the law is about
+#   flagrant    the package that switches on flagrant mode for this law, or ""
+#   flagrant_off  package to install when switching flagrant mode back off
+#               (for the age-signal stance, whose two modes conflict)
+#   flagrant_text  what switching it on does
+
+[[law]]
+id = "age-signal"
+title = "Operating-system age signals"
+jurisdiction = "California AB 1043 (2025) · Colorado SB26-051 (2026)"
+status = "California: signed 13 Oct 2025, in effect 1 Jan 2027. Colorado: signed 3 Jun 2026, in effect 1 Jul 2028."
+checked = "2026-10-06"
+asks = "Operating systems must ask for each user's birth date or age at account setup and give apps a real-time age-bracket signal (under 13, 13–15, 16–17, 18+)."
+summary = """Both laws make the operating system the age checkpoint: the OS provider \
+collects an age at account setup and answers apps that ask. No ID or photo \
+check is required. Enforcement is by each state's Attorney General, up to \
+$2,500 per affected child for negligent and $7,500 for intentional violations."""
+sources = [
+  "https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202520260AB1043",
+  "https://leg.colorado.gov/bills/sb26-051",
+]
+capability = "A computer that does not know, or report, how old its user is."
+flagrant = "ageless-flagrant"
+flagrant_off = "ageless-standard"
+flagrant_text = "Replaces the standard-mode statement with the refusal notice: no age is collected and no age-signal API of any kind is installed. agelessd sets systemd's birthDate field to null."
+
+[[law]]
+id = "vpn"
+title = "VPN and circumvention restrictions"
+jurisdiction = "Utah SB 73 (2026)"
+status = "Signed 19 Mar 2026. Its actual-location (VPN) provision was preliminarily enjoined on 24 Sep 2026; the rest is in effect."
+checked = "2026-10-06"
+asks = "Adult sites must age-verify everyone physically in Utah, VPN or not, and may not tell people how to use a VPN to get around age checks."
+summary = """Utah's law does not ban VPNs. It makes sites responsible for users' real \
+location, which a VPN hides by design, and bars covered sites from explaining \
+VPN use. A federal court found the location rule likely unconstitutional. \
+Related bills elsewhere: Wisconsin AB 105 dropped its VPN clause and was \
+vetoed (Apr 2026); Michigan HB 4938 would have had ISPs block VPNs and was \
+never voted on."""
+sources = [
+  "https://le.utah.gov/~2026/bills/static/SB0073.html",
+  "https://www.eff.org/deeplinks/2026/10/court-agrees-eff-utahs-vpn-law-demands-technical-impossibility",
+]
+capability = "Private tunnels and anonymity networks: WireGuard, OpenVPN, OpenConnect, Tor and its pluggable transports."
+flagrant = "ageless-flagrant-vpn"
+flagrant_text = "Installs the VPN and anonymity tools that ship in Debian: WireGuard, OpenVPN and OpenConnect (with their NetworkManager plugins), Tor with obfs4 and Snowflake, sshuttle and proxychains."
+
+[[law]]
+id = "emotion"
+title = "Emotion recognition"
+jurisdiction = "EU AI Act, Regulation (EU) 2024/1689, Art. 5(1)(f)"
+status = "Prohibition applies since 2 Feb 2025; penalties since 2 Aug 2025. Disclosure duty (Art. 50(3)) since 2 Aug 2026."
+checked = "2026-10-06"
+asks = "Nothing of operating systems. It bans using AI to infer people's emotions in workplaces and schools, except for medical or safety reasons."
+summary = """The Act treats emotion inference at work and in education as an \
+unacceptable risk, with fines up to €35M or 7% of turnover. Art. 5(1)(g) \
+also bans biometric categorisation that infers race, politics, religion or \
+sexual orientation. Elsewhere, deployers must tell people when emotion \
+recognition is used on them (Art. 50(3)). Owning the underlying tools is legal."""
+sources = [
+  "https://eur-lex.europa.eu/eli/reg/2024/1689/oj",
+  "https://artificialintelligenceact.eu/article/5/",
+]
+capability = "Open-source computer vision and machine learning: the building blocks such systems are made from. Debian ships no emotion classifier itself."
+flagrant = "ageless-flagrant-vision"
+flagrant_text = "Installs OpenCV (with its face-detection models), ONNX Runtime, scikit-learn and scikit-image. Nothing is run, and no camera is used."
+
+[[law]]
+id = "scanning"
+title = "Client-side message scanning"
+jurisdiction = "EU CSAM Regulation proposal, COM(2022) 209 (\"Chat Control\")"
+status = "Proposed, not adopted. Trilogue negotiations continue (latest 29 Sep 2026)."
+checked = "2026-10-06"
+asks = "As proposed: messaging services could be ordered to detect abuse material, which for end-to-end encrypted messages means scanning on the device before encryption."
+summary = """The Council and Parliament disagree on whether detection orders may cover \
+all users or only targeted suspects. Encryption experts warn that scanning \
+on the device undermines end-to-end encryption for everyone."""
+sources = [
+  "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:52022PC0209",
+  "https://www.patrick-breyer.de/en/posts/chat-control/",
+]
+capability = "Strong encryption under the user's sole control."
+flagrant = "ageless-flagrant-crypto"
+flagrant_text = "Installs file and disk encryption tools: GnuPG, age, cryptsetup and OpenSSL, plus KeePassXC."
+
+[[law]]
+id = "app-store"
+title = "App store age verification"
+jurisdiction = "Utah SB 142 (2025) · Texas SB 2420 (2025) · Louisiana HB 570 (2025)"
+status = "Utah: in effect 6 May 2027 (amended 2026). Texas: enforceable while on appeal (Fifth Circuit stay, Jun 2026). Louisiana: re-enacted, in effect 1 Jul 2027."
+checked = "2026-10-06"
+asks = "App stores must verify users' ages, get parental consent for minors' downloads, and pass age and consent status to developers."
+summary = """These laws regulate app stores rather than operating systems. Ageless \
+Linux installs software from Debian's archive and its own, neither of which \
+asks who you are. The planned Ageless Store will not collect ages either."""
+sources = [
+  "https://technologylaw.fkks.com/post/102mpap/utah-first-state-to-amend-its-app-store-accountability-act",
+  "https://ccianet.org/litigation/ccia-v-paxton-w-d-tex/",
+  "https://legis.la.gov/Legis/ViewDocument.aspx?d=1419186",
+]
+capability = "Installing software without an account or an age."
+flagrant = ""
+flagrant_text = "Nothing to install: apt never asked."

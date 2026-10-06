@@ -1,3 +1,19 @@
+ageless (0.1.1) timeless; urgency=medium
+
+  * Stance files (/etc/ageless/REFUSAL, ab1043-compliance.txt) are symlinks
+    into /usr/share/ageless/<stance>/ instead of conffiles, so switching
+    between standard and flagrant mode no longer leaves the old stance's
+    files behind.
+  * New ageless-system-info: system facts plus per-law flagrant mode, and
+    the ageless-flagrant command.
+  * New flagrant time-capsule metapackages: ageless-flagrant-vpn,
+    ageless-flagrant-vision, ageless-flagrant-crypto.
+  * ageless-standard/ageless-flagrant recommend ageless-keyring.
+  * ageless-desktop-mate: depends on the mintmenu fork and
+    ageless-system-info; new ageless-desktop-reset command.
+
+ -- Ageless Linux <archive@agelesslinux.org>  Tue, 06 Oct 2026 12:00:00 +0000
+
 ageless (0.1.0) timeless; urgency=medium
 
   * Initial packaging of the Ageless Linux base system: os-release identity,

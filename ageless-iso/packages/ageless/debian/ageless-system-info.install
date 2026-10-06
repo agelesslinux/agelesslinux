@@ -1,0 +1,5 @@
+sysinfo/ageless-system-info usr/bin
+sysinfo/ageless-flagrant usr/bin
+sysinfo/ageless_sysinfo.py usr/lib/ageless/sysinfo
+sysinfo/laws.toml usr/share/ageless
+sysinfo/ageless-system-info.desktop usr/share/applications

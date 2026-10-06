@@ -52,6 +52,7 @@ Package: ageless-standard
 Architecture: all
 Depends: ageless-os-release, ageless-compliance, ageless-agelessd,
          ${misc:Depends}
+Recommends: ageless-keyring
 Description: Ageless Linux base system (standard mode)
  Metapackage pulling in the Ageless Linux identity, the standard-mode
  compliance statement and agelessd.
@@ -60,6 +61,7 @@ Package: ageless-flagrant
 Architecture: all
 Depends: ageless-os-release, ageless-refusal, ageless-agelessd,
          ${misc:Depends}
+Recommends: ageless-keyring
 Description: Ageless Linux base system (flagrant mode)
  Metapackage pulling in the Ageless Linux identity, the flagrant-mode
  refusal notice and agelessd.
@@ -68,11 +70,12 @@ Package: ageless-desktop-mate
 Architecture: all
 Depends: ageless-standard | ageless-flagrant,
          mate-desktop-environment-core,
-         mintmenu,
+         mintmenu (>= 6.2.3+ageless1),
          mint-themes,
+         ageless-system-info,
          mint-y-icons,
          ${misc:Depends}
-Recommends: mate-desktop-environment, mate-tweak,
+Recommends: mate-desktop-environment, mate-tweak, pkexec,
             lightdm, slick-greeter, lightdm-settings,
             fonts-noto-core, blueman, network-manager-gnome, system-config-printer,
             synaptic, gdebi, timeshift, firefox-esr
@@ -84,10 +87,56 @@ Description: Ageless Linux MATE desktop defaults
 Package: ageless-maker
 Architecture: all
 Depends: ${misc:Depends}
-Recommends: arduino, avrdude, dfu-util, esptool, python3-serial, picocom,
+Recommends: ageless-device, arduino, avrdude, dfu-util, esptool, python3-serial, picocom,
             minicom, gtkterm, thonny, kicad, freecad, openscad, prusa-slicer,
             inkscape, pulseview, sigrok-cli
 Description: Ageless Linux maker toolkit
  Metapackage for electronics, embedded and fabrication work: Arduino and
  microcontroller flashing tools, serial terminals, PCB and CAD design,
  3D printing slicers and logic analysers.
+
+Package: ageless-system-info
+Architecture: all
+Depends: python3 (>= 3.11), python3-gi, gir1.2-gtk-3.0, ageless-os-release,
+         ${misc:Depends}
+Recommends: pkexec
+Description: Ageless Linux system information and per-law flagrant mode
+ Ageless System Info shows the usual facts about this computer, plus a
+ catalog of laws that ask something of operating systems (age signals, VPN
+ restrictions, emotion recognition, message scanning, app store age checks):
+ what each asks, where it stands, and its sources. Each law has a flagrant
+ mode switch that installs the open-source software the law is about.
+ The ageless-flagrant command does the same from a terminal.
+
+Package: ageless-flagrant-vpn
+Architecture: all
+Depends: wireguard-tools, openvpn, network-manager-openvpn-gnome,
+         openconnect, network-manager-openconnect-gnome,
+         tor, obfs4proxy, snowflake-client, sshuttle, proxychains4,
+         ${misc:Depends}
+Recommends: wireguard, strongswan, i2pd
+Description: Ageless Linux flagrant mode: VPNs and anonymity networks
+ Time capsule for laws that restrict VPNs or treat them as circumvention
+ (Utah SB 73, 2026): WireGuard, OpenVPN and OpenConnect with their
+ NetworkManager plugins, Tor with the obfs4 and Snowflake transports,
+ sshuttle and proxychains. Nothing is configured or started.
+
+Package: ageless-flagrant-vision
+Architecture: all
+Depends: python3-opencv, opencv-data, python3-onnxruntime, python3-sklearn,
+         python3-skimage, ${misc:Depends}
+Description: Ageless Linux flagrant mode: computer vision building blocks
+ Time capsule for the EU AI Act's ban on emotion recognition in workplaces
+ and schools (Regulation (EU) 2024/1689, Art. 5(1)(f)): OpenCV with its face
+ detection models, ONNX Runtime, scikit-learn and scikit-image. Debian
+ ships no emotion classifier; these are the open tools such systems are
+ built from. Nothing is run and no camera is used.
+
+Package: ageless-flagrant-crypto
+Architecture: all
+Depends: gnupg, age, cryptsetup, openssl, ${misc:Depends}
+Recommends: keepassxc
+Description: Ageless Linux flagrant mode: encryption under your control
+ Time capsule for proposals to scan messages on the device before they are
+ encrypted (EU "Chat Control", COM(2022) 209): GnuPG, age, cryptsetup and
+ OpenSSL, plus the KeePassXC password manager.

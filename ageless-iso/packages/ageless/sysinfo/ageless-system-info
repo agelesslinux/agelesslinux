@@ -1,0 +1,204 @@
+#!/usr/bin/python3
+"""Ageless System Info: this computer, and the laws that want something from it.
+
+Two pages:
+  This computer         the usual system facts, plus the Ageless mode
+  Laws & Flagrant mode  one card per law (laws.toml) with a switch that
+                        installs that law's "time capsule" of software
+"""
+
+import sys
+import threading
+
+import gi
+gi.require_version("Gdk", "3.0")
+gi.require_version("Gtk", "3.0")
+from gi.repository import Gdk, GLib, Gtk, Pango  # noqa: E402
+
+sys.path.insert(0, "/usr/lib/ageless/sysinfo")
+import ageless_sysinfo as ai  # noqa: E402
+
+CSS = b"""
+.ageless-card { border: 1px solid alpha(currentColor, 0.18); border-radius: 8px; padding: 14px; }
+.ageless-title { font-weight: bold; font-size: 115%; }
+.ageless-dim { opacity: 0.75; }
+.ageless-on { color: #d4a24c; font-weight: bold; }
+"""
+
+
+def label(text, *, css=None, markup=False, wrap=True, xalign=0.0, selectable=False):
+    lbl = Gtk.Label()
+    lbl.set_markup(text) if markup else lbl.set_text(text)
+    lbl.set_xalign(xalign)
+    lbl.set_line_wrap(wrap)
+    lbl.set_line_wrap_mode(Pango.WrapMode.WORD_CHAR)
+    lbl.set_selectable(selectable)
+    if css:
+        lbl.get_style_context().add_class(css)
+    return lbl
+
+
+class LawCard(Gtk.Box):
+    def __init__(self, window, law: ai.Law):
+        super().__init__(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+        self.window, self.law = window, law
+        self.get_style_context().add_class("ageless-card")
+
+        head = Gtk.Box(spacing=12)
+        titles = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
+        titles.pack_start(label(law.title, css="ageless-title"), False, False, 0)
+        titles.pack_start(label(law.jurisdiction, css="ageless-dim"), False, False, 0)
+        head.pack_start(titles, True, True, 0)
+
+        self.switch = None
+        if law.switchable:
+            box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
+            self.state = label("", xalign=0.5, wrap=False)
+            self.switch = Gtk.Switch(halign=Gtk.Align.CENTER)
+            self.switch.set_tooltip_text(law.flagrant_text)
+            self.handler = self.switch.connect("state-set", self.on_switch)
+            box.pack_start(self.switch, False, False, 0)
+            box.pack_start(self.state, False, False, 0)
+            head.pack_end(box, False, False, 0)
+        self.pack_start(head, False, False, 0)
+
+        self.pack_start(label(f"<b>Status:</b> {GLib.markup_escape_text(law.status)} "
+                              f"<span alpha='70%'>(checked {law.checked})</span>", markup=True),
+                        False, False, 0)
+        self.pack_start(label(f"<b>What it asks:</b> {GLib.markup_escape_text(law.asks)}",
+                              markup=True), False, False, 0)
+
+        more = Gtk.Expander(label="More")
+        inner = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6, margin_top=6)
+        inner.pack_start(label(" ".join(law.summary.split())), False, False, 0)
+        inner.pack_start(label(f"<b>The capability:</b> {GLib.markup_escape_text(law.capability)}",
+                               markup=True), False, False, 0)
+        inner.pack_start(label(f"<b>Flagrant mode:</b> {GLib.markup_escape_text(law.flagrant_text)}",
+                               markup=True), False, False, 0)
+        for url in law.sources:
+            link = Gtk.LinkButton.new_with_label(url, url)
+            link.set_halign(Gtk.Align.START)
+            link.get_child().set_ellipsize(Pango.EllipsizeMode.MIDDLE)
+            inner.pack_start(link, False, False, 0)
+        more.add(inner)
+        self.pack_start(more, False, False, 0)
+        self.refresh()
+
+    def refresh(self):
+        if not self.switch:
+            return
+        on = self.law.enabled()
+        self.switch.handler_block(self.handler)
+        self.switch.set_active(on)
+        self.switch.set_state(on)
+        self.switch.handler_unblock(self.handler)
+        self.state.set_text("Flagrant" if on else "Off")
+        ctx = self.state.get_style_context()
+        (ctx.add_class if on else ctx.remove_class)("ageless-on")
+
+    def on_switch(self, switch, on):
+        if on and not ai.package_available(self.law.flagrant):
+            self.window.error(f"{self.law.flagrant} is not available",
+                              "Run “sudo apt update”. The package comes from the Ageless Linux "
+                              "archive (ageless-keyring).")
+            return True  # keep the old state
+        self.switch.set_sensitive(False)
+        self.state.set_text("Working…")
+
+        def work():
+            res = ai.run_as_root(self.law.command(on))
+            GLib.idle_add(self.done, res)
+
+        threading.Thread(target=work, daemon=True).start()
+        return True  # state is set in done()
+
+    def done(self, res):
+        self.switch.set_sensitive(True)
+        if res.returncode not in (0, 126, 127):  # 126/127: pkexec dismissed or not authorized
+            self.window.error("apt-get failed", (res.stderr or res.stdout).strip()[-1500:])
+        self.refresh()
+        self.window.refresh_facts()
+
+
+class Window(Gtk.ApplicationWindow):
+    def __init__(self, app):
+        super().__init__(application=app, title="Ageless System Info")
+        self.set_default_size(760, 640)
+        self.set_icon_name("ageless-logo")
+
+        stack = Gtk.Stack(transition_type=Gtk.StackTransitionType.CROSSFADE)
+        switcher = Gtk.StackSwitcher(stack=stack, halign=Gtk.Align.CENTER)
+        header = Gtk.HeaderBar(show_close_button=True, custom_title=switcher)
+        self.set_titlebar(header)
+
+        self.facts = Gtk.Grid(column_spacing=24, row_spacing=10, margin=24)
+        page1 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        logo = Gtk.Image.new_from_icon_name("ageless-logo", Gtk.IconSize.DIALOG)
+        logo.set_pixel_size(96)
+        logo.set_margin_top(24)
+        page1.pack_start(logo, False, False, 0)
+        page1.pack_start(self.facts, False, False, 0)
+        stack.add_titled(page1, "system", "This computer")
+        self.refresh_facts()
+
+        laws = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12, margin=18)
+        laws.pack_start(label(
+            "Governments are starting to ask operating systems to check ages, see "
+            "through VPNs and scan messages. Each card says what a law asks, where it "
+            "stands, and which open-source software it is about. <b>Flagrant mode</b> "
+            "installs that software, as a time capsule of what a free computer can do. "
+            "Using it is not doing anything wrong.", markup=True), False, False, 0)
+        try:
+            entries = ai.load_laws()
+        except (OSError, ValueError) as exc:
+            entries = []
+            laws.pack_start(label(f"Could not read {ai.CATALOG}: {exc}"), False, False, 0)
+        for law in entries:
+            laws.pack_start(LawCard(self, law), False, False, 0)
+        laws.pack_start(label("Fact sheets, not legal advice. Statuses are dated; follow "
+                              "the sources for the current text.", css="ageless-dim"),
+                        False, False, 0)
+        scroller = Gtk.ScrolledWindow(hscrollbar_policy=Gtk.PolicyType.NEVER)
+        scroller.add(laws)
+        stack.add_titled(scroller, "laws", "Laws & Flagrant mode")
+
+        self.add(stack)
+        self.stack = stack
+
+    def show_page(self, name):
+        self.show_all()
+        self.stack.set_visible_child_name(name)
+
+    def refresh_facts(self):
+        for child in self.facts.get_children():
+            child.destroy()
+        for row, (key, value) in enumerate(ai.system_facts()):
+            self.facts.attach(label(key, css="ageless-dim", xalign=1.0, wrap=False), 0, row, 1, 1)
+            value_label = label(value, selectable=True)
+            value_label.set_can_focus(False)  # selectable, but don't start out highlighted
+            self.facts.attach(value_label, 1, row, 1, 1)
+        self.facts.show_all()
+
+    def error(self, title, body):
+        dlg = Gtk.MessageDialog(transient_for=self, message_type=Gtk.MessageType.ERROR,
+                                buttons=Gtk.ButtonsType.CLOSE, text=title)
+        dlg.format_secondary_text(body)
+        dlg.run()
+        dlg.destroy()
+
+
+class App(Gtk.Application):
+    def __init__(self):
+        super().__init__(application_id="org.agelesslinux.SystemInfo")
+
+    def do_activate(self):
+        provider = Gtk.CssProvider()
+        provider.load_from_data(CSS)
+        Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), provider,
+                                                 Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+        (self.get_active_window() or Window(self)).show_page(
+            "laws" if "--laws" in sys.argv[1:] else "system")
+
+
+if __name__ == "__main__":
+    sys.exit(App().run([sys.argv[0]]))
