@@ -1,0 +1,12 @@
+#!/bin/bash
+
+intltool-extract --type=gettext/glade usr/share/linuxmint/mintmenu/applications.ui
+intltool-extract --type=gettext/glade usr/share/linuxmint/mintmenu/main.ui
+intltool-extract --type=gettext/glade usr/share/linuxmint/mintmenu/places.ui
+intltool-extract --type=gettext/glade usr/share/linuxmint/mintmenu/preferences.ui
+intltool-extract --type=gettext/glade usr/share/linuxmint/mintmenu/recent.ui
+intltool-extract --type=gettext/glade usr/share/linuxmint/mintmenu/system.ui
+
+xgettext --language=Python --keyword=_ --keyword=N_ --output=mintmenu.pot usr/lib/linuxmint/mintMenu/*.py usr/lib/linuxmint/mintMenu/plugins/*.py usr/share/linuxmint/mintmenu/*.ui.h
+
+rm -rf usr/share/linuxmint/mintmenu/*.ui.h
