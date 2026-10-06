@@ -79,6 +79,22 @@ DVD-type image only holds what the profile needs (~700 MB for us).
   (`-kernel/-initrd` extracted from the ISO) to test the system, and
   firmware boot only to screenshot the bootloader.
 
+## Packaging
+
+**Conffiles survive `apt remove`.** Files a package installs under `/etc`
+are conffiles, and dpkg keeps them until the package is *purged*. Our stance
+packages (`ageless-compliance`, `ageless-refusal`) conflict, so switching
+stance removes one, but its `/etc/ageless/REFUSAL` stayed and the system
+still looked flagrant. Marker files that must come and go with a package
+belong in `/usr/share`, with symlinks into `/etc` (symlinks are not
+conffiles). The old conffiles get dropped with `rm_conffile` in
+`debian/*.maintscript`.
+
+**`dpkg-buildpackage` checks Build-Depends.** A forked upstream package
+(mintmenu needs `dh-python`) fails in a build image that only had what our
+own packages needed. `tools/build-packages.sh` installs missing build
+dependencies when it runs as root.
+
 ## Upstream Mint packages
 
 - `mintmenu` stopped tagging at 5.9.0, a Python 2 release; current releases
@@ -87,3 +103,7 @@ DVD-type image only holds what the profile needs (~700 MB for us).
   too.
 - Mint-Y-Dark-* GTK themes have no `metacity-1` directory. Pair them with the
   light-variant marco theme (`Mint-Y-Sand`), which has dark titlebars.
+- mintmenu 6.2.3 draws its search and "All applications" buttons with
+  `xsi-*` icons from `xapp-symbolic-icons`, which Debian lacks; without it
+  they render as broken-image placeholders. It is undeclared upstream. Rebuild
+  it and add the dependency.

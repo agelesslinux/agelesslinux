@@ -8,6 +8,8 @@ mintmenu (6.2.3+ageless1) timeless; urgency=medium
   * Search menu: "Find Software" searches packages.debian.org for the
     Debian base suite; the Linux Mint community searches are dropped.
   * Ageless default favorites.
+  * Depend on xapp-symbolic-icons: 6.2.3 uses xsi-* icons, which
+    Ageless rebuilds (Debian lacks the package).
 
  -- Ageless Linux <archive@agelesslinux.org>  Tue, 06 Oct 2026 12:00:00 +0000
 

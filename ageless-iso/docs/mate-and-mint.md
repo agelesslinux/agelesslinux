@@ -57,7 +57,10 @@ to build on trixie and to install together on a clean trixie system:
 |---|---|---|
 | `mint-x-icons` 1.7.9 | tag `1.7.9` | Runtime dependency of mint-themes |
 | `mint-themes` 2.4.2 | tag `2.4.2` | Provides **Mint-Y-Dark-Sand** (GTK) and **Mint-Y-Sand** (marco/metacity titlebars) |
-| `mintmenu` 6.2.3 | `master` pinned to commit `b0ff4eb` | Mint stopped tagging at 5.9.0, a Python 2 release. 6.2.3 is what LMDE 7 ships. All its dependencies are in Debian main. |
+| `xapp-symbolic-icons` 1.1.0 | tag `1.1.0` ([xapp-project](https://github.com/xapp-project/xapp-symbolic-icons)) | The `xsi-*` icons mintmenu 6.2.3 uses |
+
+`mintmenu` used to be rebuilt the same way. It is now **forked in-tree** at
+`packages/mintmenu` (6.2.3 → `6.2.3+ageless1`); see [mintmenu.md](mintmenu.md).
 
 ## What the ISO ships
 
@@ -104,4 +107,6 @@ GitHub's 2 GiB release-asset limit.
 Not in Debian, so candidates for the rebuild track or Flatpak: `arduino-cli`,
 `platformio`, `mu-editor`. "Device integration" (udev rules for common dev
 boards and serial adapters, group setup so `dialout` works on first boot)
-belongs in a future `ageless-maker-udev` package.
+is the `ageless-device` package (udev `uaccess` rules for RP2040/RP2350
+boards, the `ageless-device` CLI); see [ageless-device.md](ageless-device.md).
+Other boards' rules (ESP32 serial adapters, STM32 DFU) can join it.

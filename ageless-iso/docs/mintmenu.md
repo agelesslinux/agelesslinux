@@ -91,13 +91,15 @@ If the fork ever deserves its own repository, `git subtree split
 All of mintmenu's dependencies are in Debian main. Some features, though,
 call Mint tools that don't exist on Debian, and they **fail silently**: you
 click and nothing happens. Grepping for every external command
-(`grep -rn "Execute\|subprocess\|os.system" plugins/`) found four:
+(`grep -rn "Execute\|subprocess\|os.system" plugins/`) found four, and a
+screenshot of the open menu found a fifth:
 
 | Feature | Upstream calls | On Debian | Ageless fix |
 |---|---|---|---|
 | Right-click → **Uninstall** | `mint-remove-application` (mintcommon) | missing | `apt-helper.py remove-desktop-file`: finds the owning package with `dpkg-query -S`, simulates `apt-get remove`, shows what would go, asks, runs it through `pkexec`. Refuses if the desktop itself would be removed. |
 | Search → **Install package 'foo'** | `xdg-open apt://foo` (mintinstall/apturl) | no `apt:` handler | Uses the `apt:` handler if one is installed, else `apt-helper.py install foo`. |
 | Search → Find Tutorials / Hardware / Ideas / Users | community.linuxmint.com | Mint-only content | Dropped. **Find Software** searches packages.debian.org for the Debian base suite (`DEBIAN_CODENAME` from os-release, the LMDE convention). |
+| Search and "All applications" icons | `xsi-*` icons (6.2.3 switched to XApp Symbolic Icons) | not in Debian: broken-image placeholders | Rebuild [xapp-project/xapp-symbolic-icons](https://github.com/xapp-project/xapp-symbolic-icons) 1.1.0 (`upstream/rebuilds.toml`) and depend on it. Found from the smoke test's menu screenshot. |
 | Default favourites | Mint's app list | mostly absent | Ageless list: Firefox ESR, terminal, files, text editor; Thonny, Arduino, KiCad, FreeCAD when installed; Ageless System Info, the installer. |
 
 `apt-helper.py` is new in our tree. Upstream files carry short

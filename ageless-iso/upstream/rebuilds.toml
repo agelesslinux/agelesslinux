@@ -26,6 +26,13 @@ ref = "2.4.2"
 why = "Mint-Y GTK theme; Debian ships only mint-y-icons"
 
 [[package]]
+name = "xapp-symbolic-icons"
+kind = "git"
+url = "https://github.com/xapp-project/xapp-symbolic-icons.git"
+ref = "1.1.0"
+why = "the xsi-* icons mintmenu 6.2.3 uses (search, All applications); not in Debian"
+
+[[package]]
 name = "slick-greeter"
 kind = "backport"
 from_suite = "forky"
