@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Ageless Linux boot splash (GRUB + isolinux). live-build substitutes the
+     @PLACEHOLDERS@ in binary_bootloader_splash and renders this at 640x480
+     (isolinux) and 800x600 (GRUB). The boot menu draws over the lower half.
+     SPDX-License-Identifier: CC0-1.0 -->
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="480" viewBox="0 0 640 480">
+  <rect width="640" height="480" fill="#16161a"/>
+  <g transform="translate(36,30)">
+    <circle cx="66" cy="66" r="62" fill="#16161a" stroke="#d4a72c" stroke-width="4"/>
+    <path d="M66 66 C 54 48, 30 48, 30 66 C 30 84, 54 84, 66 66 C 78 48, 102 48, 102 66 C 102 84, 78 84, 66 66 Z"
+          fill="none" stroke="#d4a72c" stroke-width="8" stroke-linejoin="round"/>
+  </g>
+  <g font-family="DejaVu Sans, sans-serif" fill="#e8e3d6">
+    <text x="190" y="62" font-size="26" font-weight="bold">Ageless Linux @VERSION@</text>
+    <text x="190" y="88" font-size="15" fill="#d4a72c">Timeless · @ARCHITECTURE@ · based on Debian @DISTRIBUTION@</text>
+    <text x="190" y="118" font-size="11" fill="#a8a294">Built @YEAR@-@MONTH@-@DAY@ · linux @LINUX_VERSIONS@</text>
+    <text x="190" y="134" font-size="11" fill="#a8a294">live-build @LIVE_BUILD_VERSION@ · live-boot @LIVE_BOOT_VERSION@</text>
+    <text x="190" y="150" font-size="11" fill="#a8a294">This system never asks how old you are.</text>
+  </g>
+</svg>

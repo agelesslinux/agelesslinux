@@ -7,7 +7,8 @@ Two checks, both run by default:
               with console=ttyS0 against the ISO as a CD-ROM. Passes when the
               serial log shows systemd's "Welcome to Ageless Linux" banner
               (proof the squashfs, live-boot and our os-release all work) and
-              then the display manager starting.
+              then the display manager starting. It then waits for autologin
+              and saves desktop.png, a picture of the live desktop.
   firmware    Boot the ISO the way a user does, through its own bootloader
               (OVMF UEFI on amd64/arm64, SeaBIOS too on amd64), and save
               screenshots from the QEMU monitor. This exercises GRUB/isolinux
@@ -15,7 +16,7 @@ Two checks, both run by default:
               (or a later OCR step) to eyeball.
 
 Netinst ISOs boot debian-installer rather than a live system, so for them
-the serial check looks for d-i's banner instead.
+the serial check looks for d-i's main menu instead.
 
 Usage:
     tests/smoke.py out/ageless-timeless-0.1-amd64-live.iso [--arch amd64]
@@ -29,16 +30,23 @@ from __future__ import annotations
 
 import argparse
 import os
+import re
 import shutil
 import socket
 import subprocess
 import sys
 import tempfile
 import time
+import zlib
 from pathlib import Path
 
+# systemd colours its console output; markers are matched with escapes stripped.
+ANSI = re.compile(r"\x1b\[[0-9;?]*[A-Za-z]|\x1b[()][A-Za-z0-9]")
+
 LIVE_MARKERS = ["Welcome to Ageless Linux", "Light Display Manager"]
-NETINST_MARKERS = ["Ageless", "Debian GNU/Linux installer"]
+# d-i's newt title. Stock d-i brands itself "Debian"; the rootskel-gtk theme
+# udeb (roadmap Phase 2) is where an Ageless title would come from.
+NETINST_MARKERS = ["Debian installer main menu"]
 
 FIRMWARE = {
     "amd64": ("/usr/share/OVMF/OVMF_CODE_4M.fd", "/usr/share/OVMF/OVMF_VARS_4M.fd"),
@@ -105,7 +113,7 @@ def wait_for_markers(proc: subprocess.Popen, log: Path, markers: list[str], time
                 text = chunk.decode("utf-8", errors="replace")
                 fh.write(text)
                 fh.flush()
-                buf += text
+                buf = ANSI.sub("", buf + text)
                 while len(found) < len(markers) and markers[len(found)] in buf:
                     marker = markers[len(found)]
                     found.append(marker)
@@ -119,19 +127,34 @@ def wait_for_markers(proc: subprocess.Popen, log: Path, markers: list[str], time
     return found
 
 
-def serial_check(iso: Path, arch: str, timeout: int, artifacts: Path, netinst: bool) -> bool:
+def serial_check(iso: Path, arch: str, timeout: int, artifacts: Path, netinst: bool,
+                 desktop_wait: int) -> bool:
     print(f"== serial check ({arch})", flush=True)
     with tempfile.TemporaryDirectory() as tmp:
+        mon = Path(tmp) / "monitor.sock"
         kernel, initrd, cmdline = extract_boot_files(iso, Path(tmp))
         cmd = qemu_base(arch, 3072) + cdrom_args(arch, iso)
         if arch == "arm64":
             cmdline = cmdline.replace("ttyS0", "ttyAMA0")
+        if arch == "amd64":
+            cmd += ["-vga", "std"]
+        else:
+            cmd += ["-device", "ramfb"]
         cmd += ["-kernel", str(kernel), "-initrd", str(initrd), "-append", cmdline,
-                "-display", "none", "-serial", "stdio", "-monitor", "none"]
-        markers = NETINST_MARKERS[1:] if netinst else LIVE_MARKERS
+                "-display", "none", "-serial", "stdio", "-monitor", f"unix:{mon},server,nowait"]
+        markers = NETINST_MARKERS if netinst else LIVE_MARKERS
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL)
         try:
             found = wait_for_markers(proc, artifacts / "serial.log", markers, timeout)
+            if len(found) == len(markers) and desktop_wait > 0 and proc.poll() is None:
+                # The display manager is up; give autologin time to draw the
+                # desktop, then keep a picture of it for humans to review.
+                time.sleep(desktop_wait)
+                shot = artifacts / "desktop.ppm"
+                monitor_command(mon, f"screendump {shot}")
+                time.sleep(2)
+                if shot.exists():
+                    print(f"   desktop screenshot: {ppm_to_png(shot)}", flush=True)
         finally:
             proc.kill()
             proc.wait()
@@ -139,6 +162,38 @@ def serial_check(iso: Path, arch: str, timeout: int, artifacts: Path, netinst: b
     print(f"   {'PASS' if ok else 'FAIL'}: {len(found)}/{len(markers)} markers "
           f"(log: {artifacts / 'serial.log'})", flush=True)
     return ok
+
+
+def ppm_to_png(ppm: Path) -> Path:
+    """Convert QEMU's binary P6 screendump to PNG with the stdlib only."""
+    data = ppm.read_bytes()
+    fields, pos = [], 0
+    while len(fields) < 4:  # magic, width, height, maxval (skipping comments)
+        while data[pos:pos + 1].isspace():
+            pos += 1
+        if data[pos:pos + 1] == b"#":
+            pos = data.index(b"\n", pos) + 1
+            continue
+        end = pos
+        while not data[end:end + 1].isspace():
+            end += 1
+        fields.append(data[pos:end])
+        pos = end
+    pixels = data[pos + 1:]
+    width, height = int(fields[1]), int(fields[2])
+    stride = width * 3
+    raw = b"".join(b"\0" + pixels[y * stride:(y + 1) * stride] for y in range(height))
+
+    def chunk(kind: bytes, body: bytes) -> bytes:
+        return (len(body).to_bytes(4, "big") + kind + body
+                + zlib.crc32(kind + body).to_bytes(4, "big"))
+
+    png = ppm.with_suffix(".png")
+    png.write_bytes(b"\x89PNG\r\n\x1a\n"
+                    + chunk(b"IHDR", width.to_bytes(4, "big") + height.to_bytes(4, "big") + bytes([8, 2, 0, 0, 0]))
+                    + chunk(b"IDAT", zlib.compress(raw, 9)) + chunk(b"IEND", b""))
+    ppm.unlink()
+    return png
 
 
 def monitor_command(sock_path: Path, command: str) -> None:
@@ -187,7 +242,10 @@ def firmware_check(iso: Path, arch: str, mode: str, timeout: int, artifacts: Pat
             proc.wait()
     # A blank screen dump is all one colour; anything drawn means the
     # bootloader (and later the desktop) put pixels up.
-    drawn = [s for s in shots if s.exists() and len(set(s.read_bytes()[-200000:])) > 4]
+    drawn = [s for s in shots if s.exists() and len(set(s.read_bytes()[64:])) > 4]
+    for shot in shots:
+        if shot.exists():
+            ppm_to_png(shot)
     print(f"   {'PASS' if drawn else 'FAIL'}: {len(drawn)}/{len(shots)} non-blank screenshots in {artifacts}",
           flush=True)
     return bool(drawn)
@@ -199,6 +257,9 @@ def main() -> int:
     p.add_argument("--arch", choices=("amd64", "arm64"), default="amd64")
     p.add_argument("--timeout", type=int, default=900, help="seconds per check (default 900; TCG is slow)")
     p.add_argument("--only", choices=("serial", "firmware"))
+    p.add_argument("--desktop-wait", type=int, default=120,
+                   help="seconds to wait after the display manager starts before the desktop "
+                        "screenshot (0 to skip)")
     p.add_argument("--artifacts", type=Path, default=Path("smoke-artifacts"))
     args = p.parse_args()
 
@@ -211,7 +272,8 @@ def main() -> int:
 
     results = {}
     if args.only in (None, "serial"):
-        results["serial"] = serial_check(iso, args.arch, args.timeout, artifacts, netinst)
+        results["serial"] = serial_check(iso, args.arch, args.timeout, artifacts, netinst,
+                                         0 if netinst else args.desktop_wait)
     if args.only in (None, "firmware"):
         results["uefi"] = firmware_check(iso, args.arch, "uefi", min(args.timeout, 300), artifacts)
         if args.arch == "amd64":

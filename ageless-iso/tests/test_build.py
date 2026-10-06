@@ -70,5 +70,14 @@ class BuildPyTests(unittest.TestCase):
         self.assertNotIn("--privileged", run_line)
 
 
+
+class SmokeMarkerTests(unittest.TestCase):
+    def test_markers_match_through_systemd_colour_codes(self):
+        sys.path.insert(0, str(ROOT / "tests"))
+        import smoke
+        line = "\x1b[0;1;39mWelcome to \x1b[0m\x1b[1mAgeless Linux 0.1 (Timeless)\x1b[0m\x1b[0;1;39m!\x1b[0m"
+        self.assertIn(smoke.LIVE_MARKERS[0], smoke.ANSI.sub("", line))
+
+
 if __name__ == "__main__":
     unittest.main()
