@@ -31,6 +31,7 @@ plumbing. Where it departs from the 0.1 draft, this section wins.
 | os-release | `ID=ageless`, base fields | also `VERSION_CODENAME=timeless` + `DEBIAN_CODENAME=trixie` (the LMDE convention), divert `/usr/lib/os-release` with `--no-rename` | base-files is Essential. Third-party installers that read the codename need the Debian one. No `/etc/lsb-release`, because trixie's `lsb_release` reads os-release. `/etc/issue` waits for a base-files fork, since diverting a conffile causes a conffile prompt. |
 | Stance → os-release | static | `ageless-update-os-release` regenerates the compliance fields when `ageless-compliance` or `ageless-refusal` is installed or removed | Switching modes is just `apt install ageless-refusal`. |
 | Snapshot pinning | always | pinned in `common/release.env`; tag builds use it, day-to-day CI uses deb.debian.org | snapshot.debian.org rate-limits and is slow. The pin is what makes release ISOs reproducible. |
+| Netinst medium | netinst: packages from the network | simple-cdd `--dvd` (~700 MB): the Ageless, Mint and MATE-core packages are on the medium | debian-cd fills a CD-type image at 640 MB and silently drops what doesn't fit. Without an Ageless archive, the desktop can't come from the network. Revisit when `apt.agelesslinux.org` is live. |
 | Container runtime | rootful Podman | Podman **or** Docker (auto-detected) | GitHub runners ship Docker. |
 
 ### Phase 0 status

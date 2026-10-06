@@ -7,3 +7,7 @@ ageless-desktop-mate
 mintmenu
 mint-themes
 mint-x-icons
+# debian-cd reads the task definitions out of tasksel-data in the local
+# mirror, so it has to be mirrored even though d-i installs it anyway.
+tasksel
+tasksel-data

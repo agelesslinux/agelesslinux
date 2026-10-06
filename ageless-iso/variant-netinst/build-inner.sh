@@ -53,8 +53,19 @@ for deb in "$DEBS_DIR"/*.deb; do
     cp "$deb" local/
 done
 
+# simple-cdd 0.6.9 always mirrors the i386 d-i images for amd64 builds (for
+# 32-bit UEFI), but trixie no longer ships an i386 installer, so the mirror
+# step 404s. Run a copy with that block removed and tell debian-cd to skip
+# 32-bit UEFI. Fails loudly once upstream changes, so the hack gets dropped.
+sed '/For amd64 builds: debian-cd/,/a="i386")))/d' /usr/bin/build-simple-cdd > build-simple-cdd
+if cmp -s /usr/bin/build-simple-cdd build-simple-cdd; then
+    echo "E: simple-cdd i386 workaround no longer applies; remove it" >&2
+    exit 1
+fi
+export DISABLE_UEFI_32=1
+
 # simple-cdd refuses to run as root unless told otherwise (--force-root).
-build-simple-cdd \
+python3 build-simple-cdd \
     --conf profiles/ageless.conf \
     --dist "$DEBIAN_SUITE" \
     --debian-mirror "$MIRROR" \
@@ -63,9 +74,11 @@ build-simple-cdd \
     --profiles ageless \
     --auto-profiles ageless \
     --force-root \
+    --dvd \
+    --verbose \
     2>&1 | tee "$OUT_DIR/${IMAGE_NAME}.build.log"
 
-iso="$(find tmp/images -name '*.iso' | head -n1)"
+iso="$(find images -name '*.iso' | head -n1)"
 [[ -n "$iso" ]] || { echo "E: simple-cdd produced no ISO" >&2; exit 1; }
 mv "$iso" "$OUT_DIR/${IMAGE_NAME}.iso"
 cd "$OUT_DIR"

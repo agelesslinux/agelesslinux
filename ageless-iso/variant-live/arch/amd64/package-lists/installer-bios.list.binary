@@ -1,0 +1,3 @@
+# BIOS bootloader for Calamares installs; conflicts with grub-efi-amd64, so
+# it is downloaded in its own transaction (see installer.list.binary).
+grub-pc

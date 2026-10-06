@@ -1,6 +1,7 @@
 # Pool on the ISO: Calamares' bootloader-config installs these into the
 # target from the live medium (see helpers/calamares-bootloader-config).
-grub-pc
+# live-build resolves each .list.binary in its own apt transaction, so the
+# mutually-conflicting BIOS bootloader lives in installer-bios.list.binary.
 grub-efi
 grub-efi-amd64
 grub-efi-amd64-signed

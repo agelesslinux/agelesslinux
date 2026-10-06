@@ -29,7 +29,7 @@ docker run --rm --device /dev/kvm -v $PWD:/src:ro -v $PWD/out:/out localhost/age
 | Product | Tool | Audience |
 |---|---|---|
 | `ageless-timeless-0.1-<arch>-live.iso` | live-build + Calamares | Everyone. It boots to an Ageless MATE desktop with "Install Ageless Linux" on it. |
-| `ageless-timeless-0.1-<arch>-netinst.iso` | simple-cdd + stock d-i | People who know debian-installer. Packages come from the network; the ageless-* packages come from the medium. |
+| `ageless-timeless-0.1-<arch>-netinst.iso` | simple-cdd + stock d-i | People who know debian-installer. About 700 MB. Until `apt.agelesslinux.org` exists it is built as a DVD-type image, so the Ageless and Mint packages and the MATE core install offline. Everything else comes from the Debian mirror. |
 
 Packages (in `packages/`, built by `tools/build-packages.sh`):
 
@@ -69,6 +69,9 @@ QEMU smoke test, and creates a draft release on `v*` tags.
   are Phase 1 work. Until then, installed systems take updates from Debian
   only. The Calamares `sources-final` step adds the Ageless archive
   automatically once the keyring package exists.
+- The d-i image skips **32-bit UEFI** boot. simple-cdd 0.6.9 still expects
+  i386 installer images, which trixie no longer ships; `variant-netinst/build-inner.sh`
+  works around this and fails loudly once upstream fixes it.
 - **arm64** builds in CI but is experimental. Debian itself publishes no
   arm64 live images.
 - The boot menus (GRUB/isolinux) still use live-build's default look.
