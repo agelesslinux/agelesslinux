@@ -1,0 +1,6 @@
+# Copied onto the netinst medium so d-i can install them without the Ageless
+# archive. Everything else is fetched from the Debian mirror at install time.
+ageless-os-release
+ageless-agelessd
+@STANCE_PACKAGES@
+ageless-desktop-mate

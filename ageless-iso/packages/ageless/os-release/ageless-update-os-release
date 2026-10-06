@@ -1,0 +1,38 @@
+#!/bin/sh
+# ageless-update-os-release — regenerate /usr/lib/os-release
+#
+# The static identity comes from /usr/share/ageless/os-release.base; the
+# AB 1043 status fields depend on which stance package is installed
+# (ageless-compliance or ageless-refusal), so they are appended here and
+# this script is re-run from those packages' maintainer scripts.
+# SPDX-License-Identifier: Unlicense
+set -eu
+
+BASE=/usr/share/ageless/os-release.base
+TARGET=/usr/lib/os-release
+
+[ -f "$BASE" ] || exit 0
+
+if [ -f /etc/ageless/REFUSAL ]; then
+    compliance="refused"
+    api="refused"
+    status="flagrantly noncompliant"
+elif [ -f /etc/ageless/ab1043-compliance.txt ]; then
+    compliance="none"
+    api="not implemented"
+    status="intentionally noncompliant"
+else
+    compliance="undeclared"
+    api="not implemented"
+    status="undeclared"
+fi
+
+tmp="$(mktemp "${TARGET}.XXXXXX")"
+{
+    cat "$BASE"
+    echo "AGELESS_AB1043_COMPLIANCE=\"${compliance}\""
+    echo "AGELESS_AGE_VERIFICATION_API=\"${api}\""
+    echo "AGELESS_AGE_VERIFICATION_STATUS=\"${status}\""
+} > "$tmp"
+chmod 0644 "$tmp"
+mv "$tmp" "$TARGET"

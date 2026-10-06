@@ -1,0 +1,7 @@
+ageless (0.1.0) timeless; urgency=medium
+
+  * Initial packaging of the Ageless Linux base system: os-release identity,
+    AB 1043 compliance/refusal notices, agelessd, desktop defaults and
+    metapackages.
+
+ -- Ageless Linux <archive@agelesslinux.org>  Tue, 06 Oct 2026 12:00:00 +0000

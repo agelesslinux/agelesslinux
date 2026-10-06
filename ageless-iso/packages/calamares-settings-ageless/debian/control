@@ -1,0 +1,26 @@
+Source: calamares-settings-ageless
+Section: utils
+Priority: optional
+Maintainer: Ageless Linux <archive@agelesslinux.org>
+Build-Depends: debhelper-compat (= 13), libglib2.0-bin, librsvg2-bin
+Standards-Version: 4.7.0
+Rules-Requires-Root: no
+Homepage: https://agelesslinux.org
+
+Package: calamares-settings-ageless
+Architecture: all
+Depends: calamares,
+         rsync,
+         cryptsetup,
+         libglib2.0-bin,
+         keyutils,
+         pkexec,
+         qml-module-qtquick-window2,
+         qml-module-qtquick2,
+         ${misc:Depends}
+Provides: calamares-settings
+Conflicts: calamares-settings-debian
+Description: Ageless Linux theme and settings for the Calamares Installer
+ Calamares configuration, branding and helper scripts for installing
+ Ageless Linux from its live ISO. Forked from calamares-settings-debian
+ 13.0.13 (ISC); see debian/copyright.

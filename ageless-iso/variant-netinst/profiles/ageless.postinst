@@ -1,0 +1,6 @@
+#!/bin/sh
+# Runs in the target at the end of the install (simple-cdd late command).
+# Belt and braces: confirm the identity package landed.
+set -e
+. /etc/os-release
+echo "ageless.postinst: installed system identifies as $PRETTY_NAME"

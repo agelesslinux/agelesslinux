@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <!-- Ageless Linux mark: an infinity loop set in a dark disc. SPDX: CC0-1.0 -->
+  <circle cx="128" cy="128" r="120" fill="#16161a" stroke="#d4a72c" stroke-width="8"/>
+  <path d="M128 128 C 104 94, 58 94, 58 128 C 58 162, 104 162, 128 128 C 152 94, 198 94, 198 128 C 198 162, 152 162, 128 128 Z"
+        fill="none" stroke="#d4a72c" stroke-width="16" stroke-linejoin="round"/>
+</svg>

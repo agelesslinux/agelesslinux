@@ -1,0 +1,58 @@
+# Ageless Linux default MATE panel: one bottom panel, Mint-style.
+# Uses mate-menu (in Debian main) until mintmenu is rebuilt in our archive;
+# swap applet-iid to MintMenuAppletFactory::MintMenuApplet then.
+[Toplevel bottom]
+expand=true
+orientation=bottom
+size=32
+
+[Object menu]
+object-type=applet
+applet-iid=MateMenuAppletFactory::MateMenuApplet
+toplevel-id=bottom
+position=0
+locked=true
+
+[Object show-desktop]
+object-type=applet
+applet-iid=WnckletFactory::ShowDesktopApplet
+toplevel-id=bottom
+position=1
+locked=true
+
+[Object terminal-launcher]
+object-type=launcher
+launcher-location=/usr/share/applications/mate-terminal.desktop
+toplevel-id=bottom
+position=2
+locked=true
+
+[Object files-launcher]
+object-type=launcher
+launcher-location=/usr/share/applications/caja-browser.desktop
+toplevel-id=bottom
+position=3
+locked=true
+
+[Object window-list]
+object-type=applet
+applet-iid=WnckletFactory::WindowListApplet
+toplevel-id=bottom
+position=20
+locked=true
+
+[Object notification-area]
+object-type=applet
+applet-iid=NotificationAreaAppletFactory::NotificationArea
+toplevel-id=bottom
+position=10
+relative-to-edge=end
+locked=true
+
+[Object clock]
+object-type=applet
+applet-iid=ClockAppletFactory::ClockApplet
+toplevel-id=bottom
+position=0
+relative-to-edge=end
+locked=true

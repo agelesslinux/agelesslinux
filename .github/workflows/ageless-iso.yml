@@ -1,0 +1,149 @@
+# Ageless Linux ISO pipeline.
+#   push / PR touching ageless-iso/  -> lint, build .debs, build + smoke-test ISOs
+#   tag v*                           -> same, pinned to the snapshot, plus a GitHub Release
+#   workflow_dispatch                -> manual run, optionally flagrant / pinned
+name: ageless-iso
+
+on:
+  push:
+    branches: [main, "claude/**"]
+    paths: ["ageless-iso/**", ".github/workflows/ageless-iso.yml"]
+    tags: ["v*"]
+  pull_request:
+    paths: ["ageless-iso/**", ".github/workflows/ageless-iso.yml"]
+  workflow_dispatch:
+    inputs:
+      flagrant:
+        description: "Build flagrant-mode ISOs"
+        type: boolean
+        default: false
+      pinned:
+        description: "Use the snapshot.debian.org pin from common/release.env"
+        type: boolean
+        default: false
+
+concurrency:
+  group: ageless-iso-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: ageless-iso
+
+jobs:
+  lint:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: shellcheck
+        run: |
+          sudo apt-get install -y -qq shellcheck
+          shellcheck -S warning variant-*/build-inner.sh tools/*.sh \
+            packages/ageless/os-release/ageless-update-os-release \
+            packages/ageless/agelessd/agelessd
+      - name: python
+        run: |
+          python3 -m py_compile build.py tests/smoke.py
+          python3 -m unittest discover -s tests -p 'test_*.py' -v
+
+  packages:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: Build ageless-* packages
+        run: ./build.py --variant packages --runtime docker
+      - uses: actions/upload-artifact@v4
+        with:
+          name: debs
+          path: ageless-iso/out/debs/
+          retention-days: 14
+
+  iso:
+    needs: [lint, packages]
+    strategy:
+      fail-fast: false
+      matrix:
+        variant: [live, netinst]
+        arch: [amd64, arm64]
+        include:
+          - arch: amd64
+            runner: ubuntu-24.04
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    # arm64 is new territory (Debian ships no arm64 live images); keep it
+    # visible without letting it block amd64.
+    continue-on-error: ${{ matrix.arch == 'arm64' }}
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: Free disk space
+        working-directory: /
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache /usr/local/.ghcup || true
+          df -h /
+      - name: Enable KVM for the smoke test
+        working-directory: /
+        run: |
+          if [ -e /dev/kvm ]; then
+            echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+            sudo udevadm control --reload-rules && sudo udevadm trigger --name-match=kvm
+          fi
+      - name: Build ISO
+        run: |
+          args=(--variant ${{ matrix.variant }} --arch ${{ matrix.arch }} --runtime docker)
+          if [[ "${{ startsWith(github.ref, 'refs/tags/v') || inputs.pinned }}" != true ]]; then
+            args+=(--snapshot none)   # day-to-day builds track deb.debian.org; releases use the pin
+          fi
+          [[ "${{ inputs.flagrant }}" == true ]] && args+=(--flagrant)
+          ./build.py "${args[@]}"
+          ls -lh out/
+      - name: Smoke test in QEMU
+        run: |
+          iso=$(ls out/*.iso | head -n1)
+          kvm=(); [ -e /dev/kvm ] && kvm=(--device /dev/kvm)
+          docker run --rm "${kvm[@]}" -v "$PWD:/src:ro" -v "$PWD/out:/out" localhost/ageless-build:trixie \
+            python3 /src/tests/smoke.py "/out/$(basename "$iso")" --arch ${{ matrix.arch }} \
+              --timeout 900 --artifacts /out/smoke
+      - name: Check release-asset size limit (2 GiB)
+        run: |
+          for iso in out/*.iso; do
+            size=$(stat -c %s "$iso")
+            echo "$iso: $((size / 1048576)) MiB"
+            [ "$size" -lt 2147483648 ] || { echo "::error::$iso exceeds GitHub's 2 GiB release asset limit"; exit 1; }
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: iso-${{ matrix.variant }}-${{ matrix.arch }}
+          path: |
+            ageless-iso/out/*.iso
+            ageless-iso/out/*.sha256
+            ageless-iso/out/*.packages
+            ageless-iso/out/*.build.log
+            ageless-iso/out/smoke/
+          retention-days: 7
+          compression-level: 0
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [iso]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { path: dist, pattern: "iso-*", merge-multiple: true }
+      - name: Checksums
+        working-directory: dist
+        run: sha256sum *.iso > SHA256SUMS && sha512sum *.iso > SHA512SUMS
+      - uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          files: |
+            dist/*.iso
+            dist/SHA256SUMS
+            dist/SHA512SUMS
+            dist/*.packages

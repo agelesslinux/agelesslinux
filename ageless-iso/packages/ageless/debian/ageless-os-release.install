@@ -1,0 +1,4 @@
+os-release/ageless-update-os-release usr/sbin
+build/os-release.base usr/share/ageless
+build/ageless-logo.svg usr/share/icons/hicolor/scalable/apps
+build/ageless-logo-*.png usr/share/ageless/logo

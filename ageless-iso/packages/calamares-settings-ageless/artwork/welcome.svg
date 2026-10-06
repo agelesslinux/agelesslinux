@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 300" width="600" height="300">
+  <!-- Calamares welcome image. SPDX: CC0-1.0 -->
+  <rect width="600" height="300" rx="12" fill="#16161a"/>
+  <path d="M300 130 C 276 96, 230 96, 230 130 C 230 164, 276 164, 300 130 C 324 96, 370 96, 370 130 C 370 164, 324 164, 300 130 Z"
+        fill="none" stroke="#d4a72c" stroke-width="12" stroke-linejoin="round"/>
+  <text x="300" y="232" text-anchor="middle" font-family="Noto Sans, DejaVu Sans, sans-serif"
+        font-size="30" letter-spacing="8" fill="#e8e3d6">AGELESS LINUX</text>
+</svg>

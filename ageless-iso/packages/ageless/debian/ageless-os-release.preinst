@@ -1,0 +1,13 @@
+#!/bin/sh
+set -e
+# base-files is Essential, so divert without renaming and keep a copy of
+# Debian's file: /usr/lib/os-release never disappears, even mid-upgrade.
+# ageless-update-os-release (postinst) then overwrites it in place.
+if [ "$1" = install ] || [ "$1" = upgrade ]; then
+    if ! dpkg-divert --list /usr/lib/os-release | grep -q ageless-os-release; then
+        dpkg-divert --package ageless-os-release --add --no-rename \
+            --divert /usr/lib/os-release.debian /usr/lib/os-release
+        cp -a /usr/lib/os-release /usr/lib/os-release.debian
+    fi
+fi
+#DEBHELPER#

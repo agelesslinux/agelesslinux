@@ -1,0 +1,22 @@
+#!/usr/bin/make -f
+AGELESS_RELEASE_ENV ?= $(CURDIR)/../../common/release.env
+BRANDING = calamares/branding/ageless
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	test -f "$(AGELESS_RELEASE_ENV)" || { echo "missing $(AGELESS_RELEASE_ENV)"; exit 1; }
+	mkdir -p build
+	set -a; . "$(AGELESS_RELEASE_ENV)"; \
+	AGELESS_CODENAME_TITLE="$$(echo $$AGELESS_CODENAME | sed 's/^./\U&/')"; \
+	sed -e "s|@AGELESS_VERSION@|$$AGELESS_VERSION|g" \
+	    -e "s|@AGELESS_CODENAME_TITLE@|$$AGELESS_CODENAME_TITLE|g" \
+	    templates/branding.desc.in > $(BRANDING)/branding.desc
+	rsvg-convert -w 128 -h 128 artwork/ageless-logo.svg -o $(BRANDING)/ageless-logo.png
+	rsvg-convert -w 600 -h 300 artwork/welcome.svg -o $(BRANDING)/welcome.png
+	rsvg-convert -w 467 -h 280 artwork/slide1.svg -o $(BRANDING)/slide1.png
+	rsvg-convert -w 128 -h 128 artwork/ageless-logo.svg -o build/install-ageless.png
+
+override_dh_auto_clean:
+	rm -rf build $(BRANDING)/*.png $(BRANDING)/branding.desc

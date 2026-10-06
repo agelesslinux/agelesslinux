@@ -1,0 +1,6 @@
+desktop/ageless.layout usr/share/mate-panel/layouts
+build/90_ageless-desktop.gschema.override usr/share/glib-2.0/schemas
+desktop/90-ageless-slick-greeter.conf usr/share/lightdm/lightdm.conf.d
+desktop/slick-greeter.conf etc/lightdm
+build/ageless-default.png usr/share/backgrounds/ageless
+build/ageless-default-4k.png usr/share/backgrounds/ageless

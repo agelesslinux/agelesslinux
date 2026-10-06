@@ -1,0 +1,40 @@
+---
+componentName:   ageless
+
+welcomeStyleCalamares: true
+welcomeExpandingLogo: true
+windowExpanding: normal
+windowSize: 800px,580px
+windowPlacement: center
+
+strings:
+    productName:         Ageless Linux
+    shortProductName:    Ageless
+    version:             "@AGELESS_VERSION@"
+    shortVersion:        "@AGELESS_VERSION@"
+    versionedName:       Ageless Linux @AGELESS_VERSION@ (@AGELESS_CODENAME_TITLE@)
+    shortVersionedName:  Ageless @AGELESS_VERSION@
+    bootloaderEntryName: Ageless
+    productUrl:          https://agelesslinux.org
+    supportUrl:          https://agelesslinux.org
+    knownIssuesUrl:      https://github.com/agelesslinux/agelesslinux/issues
+    releaseNotesUrl:     https://agelesslinux.org
+    donateUrl:           https://agelesslinux.org
+
+sidebar: widget
+navigation: widget
+
+images:
+    productLogo:         "ageless-logo.png"
+    productIcon:         "ageless-logo.png"
+    productWelcome:      "welcome.png"
+
+slideshow:               "show.qml"
+
+style:
+   SidebarBackground:    "#16161a"
+   SidebarText:          "#e8e3d6"
+   SidebarTextCurrent:   "#16161a"
+   SidebarBackgroundCurrent: "#d4a72c"
+
+slideshowAPI: 2

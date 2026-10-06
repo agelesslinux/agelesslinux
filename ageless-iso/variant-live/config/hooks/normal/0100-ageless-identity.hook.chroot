@@ -1,0 +1,9 @@
+#!/bin/sh
+# Sanity-check that the Ageless identity landed in the image.
+set -e
+. /etc/os-release
+if [ "$ID" != ageless ]; then
+    echo "E: /etc/os-release says ID=$ID, expected ageless" >&2
+    exit 1
+fi
+echo "I: image identifies as: $PRETTY_NAME"

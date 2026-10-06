@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+if [ "$1" = remove ] || [ "$1" = abort-install ] || [ "$1" = disappear ]; then
+    if [ -f /usr/lib/os-release.debian ]; then
+        mv -f /usr/lib/os-release.debian /usr/lib/os-release
+    fi
+    dpkg-divert --package ageless-os-release --remove --no-rename \
+        --divert /usr/lib/os-release.debian /usr/lib/os-release
+fi
+#DEBHELPER#

@@ -1,0 +1,81 @@
+#!/bin/bash
+# ============================================================================
+#  agelessd — Ageless Linux birthDate Neutralization Daemon
+#
+#  Ensures systemd userdb birthDate fields (PR #40954) remain neutralized.
+#  Runs every 24 hours via systemd timer.
+#
+#  NOTE: This daemon does NOT reload systemd-userdbd after writing records.
+#  Reloading mid-session can break display manager lock screens (SDDM, LightDM, etc).
+#  Changes take effect on next login or boot.
+#
+#  SPDX-License-Identifier: Unlicense
+# ============================================================================
+
+set -euo pipefail
+
+# Packaged build: flagrant mode follows the installed stance package.
+if [[ -f /etc/ageless/REFUSAL ]]; then
+    MODE="flagrant"
+else
+    MODE="regular"
+fi
+
+# Same gate as become-ageless.sh: userdb drop-ins are only written where
+# systemd-userdbd is installed. Elsewhere there is no birthDate to neutralize.
+if ! systemctl list-unit-files systemd-userdbd.service 2>/dev/null | grep -q '^systemd-userdbd.service'; then
+    exit 0
+fi
+
+if [[ "$MODE" == "flagrant" ]]; then
+    BIRTH_DATE_JSON="null"
+else
+    BIRTH_DATE_JSON='"1970-01-01"'
+fi
+
+mkdir -p /etc/userdb
+
+while IFS=: read -r username _x uid gid gecos homedir shell; do
+    if [[ $uid -ge 1000 && $uid -lt 65534 ]]; then
+        USERDB_FILE="/etc/userdb/${username}.user"
+        realname="${gecos%%,*}"
+
+        if [[ -f "$USERDB_FILE" ]] && command -v python3 &>/dev/null; then
+            python3 -c '
+import json, sys
+fp, mode = sys.argv[1], sys.argv[2]
+uname, uid, gid, rname, hdir, sh = sys.argv[3:9]
+try:
+    with open(fp) as f: rec = json.load(f)
+except Exception: rec = {}
+rec.update({
+    "userName": uname, "uid": int(uid), "gid": int(gid),
+    "realName": rname, "homeDirectory": hdir, "shell": sh,
+    "disposition": "regular",
+    "birthDate": None if mode == "flagrant" else "1970-01-01"
+})
+with open(fp, "w") as f:
+    json.dump(rec, f, indent=2)
+    f.write("\n")
+' "$USERDB_FILE" "$MODE" \
+              "$username" "$uid" "$gid" "$realname" "$homedir" "$shell"
+        elif [[ -f "$USERDB_FILE" ]]; then
+            continue
+        else
+            realname_escaped="${realname//\\/\\\\}"
+            realname_escaped="${realname_escaped//\"/\\\"}"
+            printf '{\n  "userName": "%s",\n  "uid": %d,\n  "gid": %d,\n  "realName": "%s",\n  "homeDirectory": "%s",\n  "shell": "%s",\n  "disposition": "regular",\n  "birthDate": %s\n}\n' \
+                "$username" "$uid" "$gid" "$realname_escaped" "$homedir" "$shell" "$BIRTH_DATE_JSON" > "$USERDB_FILE"
+        fi
+
+        chmod 0644 "$USERDB_FILE"
+
+        if command -v homectl &>/dev/null; then
+            if [[ "$MODE" == "flagrant" ]]; then
+                homectl update "$username" --birth-date= 2>/dev/null || true
+            else
+                homectl update "$username" --birth-date=1970-01-01 2>/dev/null || true
+            fi
+        fi
+    fi
+done < /etc/passwd

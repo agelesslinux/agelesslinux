@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080">
+  <!-- Ageless Linux default wallpaper. SPDX: CC0-1.0 -->
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="45%" r="75%">
+      <stop offset="0" stop-color="#26262c"/>
+      <stop offset="1" stop-color="#101013"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#d4a72c" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#d4a72c" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#d4a72c" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#bg)"/>
+  <path d="M960 500 C 900 415, 785 415, 785 500 C 785 585, 900 585, 960 500 C 1020 415, 1135 415, 1135 500 C 1135 585, 1020 585, 960 500 Z"
+        fill="none" stroke="#d4a72c" stroke-width="22" stroke-linejoin="round" opacity="0.92"/>
+  <rect x="560" y="660" width="800" height="2" fill="url(#gold)"/>
+  <text x="960" y="730" text-anchor="middle" font-family="Noto Sans, DejaVu Sans, sans-serif"
+        font-size="40" letter-spacing="14" fill="#e8e3d6" opacity="0.85">AGELESS LINUX</text>
+</svg>

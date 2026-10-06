@@ -1,0 +1,35 @@
+#!/usr/bin/make -f
+# Release identity comes from the repo's common/release.env unless the
+# caller points AGELESS_RELEASE_ENV elsewhere (e.g. a standalone checkout).
+AGELESS_RELEASE_ENV ?= $(CURDIR)/../../common/release.env
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	test -f "$(AGELESS_RELEASE_ENV)" || { echo "missing $(AGELESS_RELEASE_ENV)"; exit 1; }
+	mkdir -p build
+	set -a; . "$(AGELESS_RELEASE_ENV)"; \
+	AGELESS_CODENAME_TITLE="$$(echo $$AGELESS_CODENAME | sed 's/^./\U&/')"; \
+	for f in os-release/os-release.in:os-release.base \
+	         desktop/ageless-desktop.gschema.override.in:90_ageless-desktop.gschema.override; do \
+	    sed -e "s|@AGELESS_NAME@|$$AGELESS_NAME|g" \
+	        -e "s|@AGELESS_VERSION@|$$AGELESS_VERSION|g" \
+	        -e "s|@AGELESS_CODENAME@|$$AGELESS_CODENAME|g" \
+	        -e "s|@AGELESS_CODENAME_TITLE@|$$AGELESS_CODENAME_TITLE|g" \
+	        -e "s|@DEBIAN_SUITE@|$$DEBIAN_SUITE|g" \
+	        -e "s|@DEBIAN_VERSION@|$$DEBIAN_VERSION|g" \
+	        "$${f%%:*}" > "build/$${f##*:}"; \
+	done
+	cp desktop/artwork/ageless-logo.svg build/
+	for s in 64 128 256; do \
+	    rsvg-convert -w $$s -h $$s desktop/artwork/ageless-logo.svg -o build/ageless-logo-$$s.png; \
+	done
+	rsvg-convert -w 1920 -h 1080 desktop/artwork/wallpaper.svg -o build/ageless-default.png
+	rsvg-convert -w 3840 -h 2160 desktop/artwork/wallpaper.svg -o build/ageless-default-4k.png
+
+override_dh_auto_clean:
+	rm -rf build
+
+override_dh_installsystemd:
+	dh_installsystemd -pageless-agelessd --name=agelessd

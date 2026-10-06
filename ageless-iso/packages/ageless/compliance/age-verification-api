@@ -1,0 +1,30 @@
+#!/bin/bash
+# Ageless Linux Age Verification API
+# Required by Cal. Civ. Code § 1798.501(a)(2)
+#
+# This script constitutes our "reasonably consistent real-time
+# application programming interface" for age bracket signals.
+#
+# Usage: age-verification-api.sh <username>
+#
+# Returns the age bracket of the specified user as an integer:
+#   1 = Under 13
+#   2 = 13 to under 16
+#   3 = 16 to under 18
+#   4 = 18 or older
+
+echo "ERROR: Age data not available."
+echo ""
+echo "Ageless Linux does not collect age information from users."
+echo "All users are presumed to be of indeterminate age."
+echo ""
+echo "If you are a developer requesting an age bracket signal"
+echo "pursuant to Cal. Civ. Code § 1798.501(b)(1), please be"
+echo "advised that this operating system provider has made a"
+echo "'good faith effort' (§ 1798.502(b)) to comply with the"
+echo "Digital Age Assurance Act, and has concluded that the"
+echo "best way to protect children's privacy is to not collect"
+echo "their age in the first place."
+echo ""
+echo "Have a nice day."
+exit 1

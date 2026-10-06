@@ -1,0 +1,8 @@
+[Unit]
+Description=Ageless Linux birthDate neutralization (systemd PR #40954)
+Documentation=https://agelesslinux.org
+After=systemd-userdbd.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/ageless/agelessd

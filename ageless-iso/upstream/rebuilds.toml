@@ -1,0 +1,36 @@
+# Packages Ageless Linux rebuilds for its archive (see docs/mate-and-mint.md).
+# Built by tools/rebuild.py inside the build container.
+#
+#   kind = "git"       clone url at ref, dpkg-buildpackage (upstream ships debian/)
+#   kind = "backport"  apt-get source from `from_suite`, rebuild for trixie with
+#                      a ~ageless version suffix so Debian's next release wins
+#
+# `enabled = false` entries are planned but not yet validated.
+
+[[package]]
+name = "mint-themes"
+kind = "git"
+url = "https://github.com/linuxmint/mint-themes.git"
+ref = "2.4.2"
+why = "Mint-Y GTK theme; Debian ships only mint-y-icons"
+
+[[package]]
+name = "mintmenu"
+kind = "git"
+url = "https://github.com/linuxmint/mintmenu.git"
+ref = "5.9.0"
+why = "Mint's MATE menu; replaces mate-menu in the ageless panel layout"
+
+[[package]]
+name = "slick-greeter"
+kind = "backport"
+from_suite = "forky"
+why = "2.2.x greeter (trixie has 2.0.9)"
+enabled = false
+
+[[package]]
+name = "mate-desktop"
+kind = "backport"
+from_suite = "forky"
+why = "first step of the MATE 1.28 stack"
+enabled = false

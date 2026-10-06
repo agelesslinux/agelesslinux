@@ -1,0 +1,41 @@
+═══════════════════════════════════════════════════════════════════════
+  AGELESS LINUX — AB 1043 COMPLIANCE STATEMENT (FLAGRANT MODE)
+═══════════════════════════════════════════════════════════════════════
+
+  This operating system is distributed by an operating system provider
+  as defined by California Civil Code § 1798.500(g).
+
+  Status of compliance with the Digital Age Assurance Act (AB 1043):
+
+  § 1798.501(a)(1) — Accessible interface for age collection .. REFUSED
+  § 1798.501(a)(2) — Real-time API for age bracket signals .... REFUSED
+  § 1798.501(a)(3) — Data minimization ........................ REFUSED
+
+  No age verification API is installed on this system. No stub, no
+  placeholder, no skeleton, no interface of any kind. No mechanism
+  exists on this system by which any application developer could
+  request or receive an age bracket signal, now or in the future.
+
+  This is not a technical limitation. This is a policy decision.
+
+  Age bracket reporting capabilities:
+    Under 13 ....... WE REFUSE TO ASK
+    13 to 15 ....... WE REFUSE TO ASK
+    16 to 17 ....... WE REFUSE TO ASK
+    18 or older .... WE REFUSE TO ASK
+
+  This system was configured with the --flagrant flag, indicating
+  that the operator intends to distribute it to children and is
+  aware of the potential civil penalties under § 1798.503(a).
+
+  The operator of this system invites the California Attorney General
+  to enforce the Digital Age Assurance Act against this device.
+
+  This system was installed natively as Ageless Linux. To remove the
+  Ageless identity and these notices:
+    sudo apt purge ageless-os-release
+
+  To report this noncompliance to the California Attorney General:
+    https://oag.ca.gov/contact/consumer-complaint-against-business-or-company
+
+═══════════════════════════════════════════════════════════════════════

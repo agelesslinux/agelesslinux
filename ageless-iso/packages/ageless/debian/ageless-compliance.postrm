@@ -1,0 +1,6 @@
+#!/bin/sh
+set -e
+if [ "$1" = remove ] && command -v ageless-update-os-release >/dev/null; then
+    ageless-update-os-release
+fi
+#DEBHELPER#

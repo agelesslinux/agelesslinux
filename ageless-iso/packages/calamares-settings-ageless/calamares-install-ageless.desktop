@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Install Ageless Linux
+GenericName=Calamares Installer
+Exec=calamares-install-ageless
+Comment=Calamares — Installer for Ageless Linux Live
+Keywords=calamares;system;install;ageless;debian;installer
+Icon=install-ageless
+Terminal=false
+Categories=Qt;System;
+StartupWMClass=calamares
+StartupNotify=True

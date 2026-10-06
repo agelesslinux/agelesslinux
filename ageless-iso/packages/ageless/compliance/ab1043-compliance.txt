@@ -1,0 +1,37 @@
+═══════════════════════════════════════════════════════════════════════
+  AGELESS LINUX — AB 1043 COMPLIANCE STATEMENT
+═══════════════════════════════════════════════════════════════════════
+
+  This operating system is distributed by an operating system provider
+  as defined by California Civil Code § 1798.500(g).
+
+  Status of compliance with the Digital Age Assurance Act (AB 1043):
+
+  § 1798.501(a)(1) — Accessible interface at account setup
+    for age/birthdate collection .......................... NOT PROVIDED
+
+  § 1798.501(a)(2) — Real-time API for age bracket signals
+    to application developers ............................. NOT PROVIDED
+
+  § 1798.501(a)(3) — Data minimization for age signals .... N/A (NO DATA
+                                                             IS COLLECTED)
+
+  Age bracket reporting capabilities:
+    Under 13 ....... UNKNOWN
+    13 to 15 ....... UNKNOWN
+    16 to 17 ....... UNKNOWN
+    18 or older .... UNKNOWN
+    Timeless ....... ASSUMED
+
+  This system intentionally does not determine, store, or transmit
+  any information regarding the age of any user. All users of Ageless
+  Linux are, as the name suggests, ageless.
+
+  This system was installed natively as Ageless Linux. To remove the
+  Ageless identity and these notices:
+    sudo apt purge ageless-os-release
+
+  To report this noncompliance to the California Attorney General:
+    https://oag.ca.gov/contact/consumer-complaint-against-business-or-company
+
+═══════════════════════════════════════════════════════════════════════

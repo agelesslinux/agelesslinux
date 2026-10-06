@@ -1,0 +1,7 @@
+# Live session only: this package is removed from the installed system.
+[org.mate.screensaver]
+lock-enabled=false
+idle-activation-enabled=false
+
+[org.mate.session]
+idle-delay=0

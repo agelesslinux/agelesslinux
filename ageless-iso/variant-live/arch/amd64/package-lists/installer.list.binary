@@ -1,0 +1,8 @@
+# Pool on the ISO: Calamares' bootloader-config installs these into the
+# target from the live medium (see helpers/calamares-bootloader-config).
+grub-pc
+grub-efi
+grub-efi-amd64
+grub-efi-amd64-signed
+shim-signed
+cryptsetup-initramfs

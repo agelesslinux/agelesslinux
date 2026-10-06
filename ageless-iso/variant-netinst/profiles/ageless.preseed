@@ -1,0 +1,26 @@
+# Ageless Linux netinst preseed — answers that make d-i install Ageless
+# Linux instead of plain Debian. Everything not answered here is still asked
+# (language, keyboard, user account, partitioning) so a human stays in charge.
+# docs/preseed-anatomy.md walks through each line.
+
+### Mirror: Debian packages come from the network
+d-i mirror/country string manual
+d-i mirror/http/hostname string deb.debian.org
+d-i mirror/http/directory string /debian
+d-i mirror/http/proxy string
+d-i apt-setup/non-free-firmware boolean true
+d-i apt-setup/contrib boolean true
+d-i apt-setup/services-select multiselect security, updates
+# Keep the medium as a package source: it carries the ageless-* packages
+d-i apt-setup/disable-cdrom-entries boolean false
+d-i apt-setup/cdrom/set-first boolean false
+
+### Software: the MATE desktop plus the Ageless system
+tasksel tasksel/first multiselect standard, mate-desktop
+d-i pkgsel/include string @PKGSEL_INCLUDE@
+d-i pkgsel/upgrade select safe-upgrade
+popularity-contest popularity-contest/participate boolean false
+
+### Boot loader
+d-i grub-installer/only_debian boolean true
+d-i grub-installer/with_other_os boolean true

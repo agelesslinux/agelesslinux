@@ -1,0 +1,90 @@
+Source: ageless
+Section: misc
+Priority: optional
+Maintainer: Ageless Linux <archive@agelesslinux.org>
+Build-Depends: debhelper-compat (= 13), librsvg2-bin
+Standards-Version: 4.7.0
+Rules-Requires-Root: no
+Homepage: https://agelesslinux.org
+Vcs-Git: https://github.com/agelesslinux/agelesslinux.git
+Vcs-Browser: https://github.com/agelesslinux/agelesslinux
+
+Package: ageless-os-release
+Architecture: all
+Depends: base-files, ${misc:Depends}
+Description: Ageless Linux operating system identity
+ Diverts /usr/lib/os-release from base-files and replaces it with the
+ Ageless Linux identity (ID=ageless, ID_LIKE=debian). VERSION_CODENAME is
+ the Ageless codename; DEBIAN_CODENAME carries the Debian base suite, the
+ same convention LMDE uses, so third-party installers can still find their
+ Debian repositories.
+
+Package: ageless-compliance
+Architecture: all
+Depends: ageless-os-release, ${misc:Depends}
+Conflicts: ageless-refusal
+Provides: ageless-stance
+Description: Ageless Linux AB 1043 compliance statement (standard mode)
+ Installs /etc/ageless/ab1043-compliance.txt and the deliberately
+ nonfunctional age verification API stub.
+
+Package: ageless-refusal
+Architecture: all
+Depends: ageless-os-release, ${misc:Depends}
+Conflicts: ageless-compliance
+Provides: ageless-stance
+Description: Ageless Linux AB 1043 refusal notice (flagrant mode)
+ Installs /etc/ageless/ab1043-compliance.txt in flagrant mode and the
+ machine-readable /etc/ageless/REFUSAL. No age verification API of any
+ kind is installed.
+
+Package: ageless-agelessd
+Architecture: all
+Depends: python3, ${misc:Depends}
+Recommends: ageless-compliance | ageless-refusal
+Description: Ageless Linux birthDate neutralization daemon
+ A 24-hour systemd timer that keeps systemd userdb birthDate fields
+ (systemd PR #40954) neutralized for every human user. It does nothing on
+ systems where systemd-userdbd is not installed. Flagrant mode (null
+ birthDate) is selected automatically when ageless-refusal is installed.
+
+Package: ageless-standard
+Architecture: all
+Depends: ageless-os-release, ageless-compliance, ageless-agelessd,
+         ${misc:Depends}
+Description: Ageless Linux base system (standard mode)
+ Metapackage pulling in the Ageless Linux identity, the standard-mode
+ compliance statement and agelessd.
+
+Package: ageless-flagrant
+Architecture: all
+Depends: ageless-os-release, ageless-refusal, ageless-agelessd,
+         ${misc:Depends}
+Description: Ageless Linux base system (flagrant mode)
+ Metapackage pulling in the Ageless Linux identity, the flagrant-mode
+ refusal notice and agelessd.
+
+Package: ageless-desktop-mate
+Architecture: all
+Depends: ageless-standard | ageless-flagrant,
+         mate-desktop-environment-core,
+         ${misc:Depends}
+Recommends: mate-desktop-environment, mate-menu, mate-tweak,
+            lightdm, slick-greeter, lightdm-settings, mint-y-icons, arc-theme,
+            fonts-noto-core, blueman, network-manager-gnome, system-config-printer,
+            synaptic, gdebi, timeshift, firefox-esr
+Description: Ageless Linux MATE desktop defaults
+ Default wallpaper, theme, panel layout and greeter configuration for the
+ Ageless Linux MATE desktop. Settings are applied as GSettings vendor
+ overrides, so users can still change everything.
+
+Package: ageless-maker
+Architecture: all
+Depends: ${misc:Depends}
+Recommends: arduino, avrdude, dfu-util, esptool, python3-serial, picocom,
+            minicom, gtkterm, thonny, kicad, freecad, openscad, prusa-slicer,
+            inkscape, pulseview, sigrok-cli
+Description: Ageless Linux maker toolkit
+ Metapackage for electronics, embedded and fabrication work: Arduino and
+ microcontroller flashing tools, serial terminals, PCB and CAD design,
+ 3D printing slicers and logic analysers.

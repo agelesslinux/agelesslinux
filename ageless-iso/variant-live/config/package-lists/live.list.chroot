@@ -1,0 +1,4 @@
+# Live-session plumbing (Calamares removes these from the installed system)
+live-boot
+live-config
+live-config-systemd

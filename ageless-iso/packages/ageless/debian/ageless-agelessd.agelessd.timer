@@ -1,0 +1,11 @@
+[Unit]
+Description=Neutralize systemd userdb birthDate fields every 24 hours
+Documentation=https://agelesslinux.org
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=24h
+Persistent=true
+
+[Install]
+WantedBy=timers.target

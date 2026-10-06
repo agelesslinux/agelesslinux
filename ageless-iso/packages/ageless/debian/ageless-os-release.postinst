@@ -1,0 +1,6 @@
+#!/bin/sh
+set -e
+if [ "$1" = configure ]; then
+    ageless-update-os-release
+fi
+#DEBHELPER#
