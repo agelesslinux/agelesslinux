@@ -1,0 +1,185 @@
+#!/usr/bin/python3
+"""ageless-device: talk to an Ageless Device (or any RP2040/RP2350 board) over USB.
+
+    ageless-device list                    connected boards and what mode they are in
+    ageless-device flash <firmware.uf2>    flash a board in BOOTSEL mode
+    ageless-device ls [path]               list files on a MicroPython board
+    ageless-device push <local> [remote]   copy a file or directory to the board
+    ageless-device pull <remote> [local]   copy a file from the board
+    ageless-device repl                    open the MicroPython prompt
+
+With several boards connected, pick one with --port /dev/ageless/... (see
+`list`). File commands use mpremote (package micropython-mpremote); flashing
+copies the UF2 to the BOOTSEL drive, or uses picotool when the drive is not
+mounted. Wi-Fi sync and app installs from the Ageless Store come later; see
+docs/ageless-device.md in the Ageless Linux source.
+"""
+
+import argparse
+import os
+import shutil
+import subprocess
+import sys
+import time
+from dataclasses import dataclass
+from pathlib import Path
+
+SYSFS = Path(os.environ.get("AGELESS_DEVICE_SYSFS", "/sys/bus/usb/devices"))
+VENDOR = "2e8a"
+MODES = {
+    "0003": "bootsel-rp2040",
+    "000f": "bootsel-rp2350",
+    "0005": "micropython",
+    "0009": "pico-sdk",
+    "000a": "pico-sdk",
+    "000c": "debug-probe",
+}
+UF2_DRIVE_MARKER = "INFO_UF2.TXT"
+
+
+@dataclass
+class Board:
+    sysfs: Path
+    product_id: str
+    product: str
+    serial: str
+    ttys: list[str]
+
+    @property
+    def mode(self) -> str:
+        return MODES.get(self.product_id, f"unknown-{self.product_id}")
+
+    @property
+    def port(self) -> str | None:
+        """Stable /dev/ageless/... name from our udev rules, else the raw tty."""
+        prefix = {"micropython": "micropython", "pico-sdk": "pico", "debug-probe": "debugprobe"}
+        if self.mode in prefix:
+            link = Path("/dev/ageless") / f"{prefix[self.mode]}-{self.serial}"
+            if link.exists():
+                return str(link)
+        return f"/dev/{self.ttys[0]}" if self.ttys else None
+
+
+def read(path: Path) -> str:
+    try:
+        return path.read_text().strip()
+    except OSError:
+        return ""
+
+
+def find_boards(sysfs: Path = SYSFS) -> list[Board]:
+    boards = []
+    if not sysfs.is_dir():
+        return boards
+    for dev in sorted(sysfs.iterdir()):
+        if read(dev / "idVendor") != VENDOR:
+            continue
+        # CDC ACM ports live at <dev>:<cfg>.<iface>/tty/ttyACM<n>
+        ttys = [t.name for t in dev.glob("*:*/tty/tty*")]
+        boards.append(Board(sysfs=dev, product_id=read(dev / "idProduct"),
+                            product=read(dev / "product") or "RP2 board",
+                            serial=read(dev / "serial"), ttys=sorted(set(ttys))))
+    return boards
+
+
+def uf2_drives() -> list[Path]:
+    """Mounted BOOTSEL drives (RPI-RP2 / RP2350): they carry INFO_UF2.TXT."""
+    drives = []
+    try:
+        with open("/proc/mounts") as f:
+            for line in f:
+                mnt = Path(line.split()[1].replace("\\040", " "))
+                if (mnt / UF2_DRIVE_MARKER).is_file():
+                    drives.append(mnt)
+    except OSError:
+        pass
+    return drives
+
+
+def cmd_list(args) -> int:
+    boards = find_boards()
+    if not boards:
+        print("No RP2040/RP2350 boards found. Plug one in (hold BOOTSEL to flash it).")
+        return 1
+    for b in boards:
+        where = b.port or ", ".join(str(d) for d in uf2_drives()) or "-"
+        print(f"{b.mode:<15} {b.product:<28} serial={b.serial or '?':<18} {where}")
+    return 0
+
+
+def cmd_flash(args) -> int:
+    uf2 = Path(args.firmware)
+    if uf2.suffix.lower() != ".uf2" or not uf2.is_file():
+        sys.exit(f"error: {uf2} is not a .uf2 file")
+    drives = uf2_drives()
+    if len(drives) > 1:
+        sys.exit("error: several BOOTSEL drives are mounted; unplug all but one")
+    if drives:
+        print(f"Copying {uf2.name} to {drives[0]} …")
+        shutil.copyfile(uf2, drives[0] / uf2.name)
+        os.sync()
+        print("Done; the board reboots into the new firmware.")
+        return 0
+    if shutil.which("picotool"):
+        print("No BOOTSEL drive mounted; flashing with picotool …")
+        return subprocess.call(["picotool", "load", "-v", "-x", str(uf2)])
+    sys.exit("error: no BOOTSEL drive found. Hold BOOTSEL while plugging the board in, "
+             "or install picotool.")
+
+
+def mpremote(args, *words: str) -> int:
+    tool = shutil.which("mpremote")
+    if not tool:
+        sys.exit("error: mpremote not found; sudo apt install micropython-mpremote")
+    port = args.port
+    if port is None:
+        mp = [b for b in find_boards() if b.mode == "micropython" and b.port]
+        if not mp:
+            sys.exit("error: no MicroPython board found (ageless-device list)")
+        if len(mp) > 1:
+            sys.exit("error: several MicroPython boards; pick one with --port")
+        port = mp[0].port
+    return subprocess.call([tool, "connect", port, *words])
+
+
+def cmd_ls(args) -> int:
+    return mpremote(args, "fs", "ls", args.path)
+
+
+def cmd_push(args) -> int:
+    local = Path(args.local)
+    remote = ":" + (args.remote or local.name)
+    flags = ["-r"] if local.is_dir() else []
+    return mpremote(args, "fs", "cp", *flags, str(local), remote)
+
+
+def cmd_pull(args) -> int:
+    return mpremote(args, "fs", "cp", ":" + args.remote, args.local or Path(args.remote).name)
+
+
+def cmd_repl(args) -> int:
+    return mpremote(args, "repl")
+
+
+def main(argv=None) -> int:
+    p = argparse.ArgumentParser(prog="ageless-device", description=__doc__.splitlines()[0],
+                                formatter_class=argparse.RawDescriptionHelpFormatter,
+                                epilog="\n".join(__doc__.splitlines()[2:]))
+    p.add_argument("--port", help="serial port of the board (default: the only MicroPython board)")
+    sub = p.add_subparsers(dest="cmd")
+    sub.add_parser("list").set_defaults(func=cmd_list)
+    f = sub.add_parser("flash"); f.add_argument("firmware"); f.set_defaults(func=cmd_flash)
+    ls = sub.add_parser("ls"); ls.add_argument("path", nargs="?", default="/"); ls.set_defaults(func=cmd_ls)
+    pu = sub.add_parser("push"); pu.add_argument("local"); pu.add_argument("remote", nargs="?")
+    pu.set_defaults(func=cmd_push)
+    pl = sub.add_parser("pull"); pl.add_argument("remote"); pl.add_argument("local", nargs="?")
+    pl.set_defaults(func=cmd_pull)
+    sub.add_parser("repl").set_defaults(func=cmd_repl)
+    args = p.parse_args(argv)
+    if not args.cmd:
+        return cmd_list(args)
+    return args.func(args)
+
+
+if __name__ == "__main__":
+    sys.exit(main())

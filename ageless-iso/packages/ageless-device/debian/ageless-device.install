@@ -1,0 +1,2 @@
+bin/ageless-device usr/bin
+udev/70-ageless-device.rules usr/lib/udev/rules.d

@@ -1,0 +1,28 @@
+# Ageless Device and other Raspberry Pi RP2040/RP2350 boards.
+#
+# TAG+="uaccess" gives the user at the local seat read/write access (no
+# dialout group or sudo needed). Serial ports also get stable names:
+#   /dev/ageless/<mode>-<usb serial number>
+#
+# USB IDs (vendor 2e8a = Raspberry Pi):
+#   0003  RP2040 BOOTSEL (mass storage "RPI-RP2" + picoboot)
+#   000f  RP2350 BOOTSEL (mass storage "RP2350" + picoboot)
+#   0005  MicroPython
+#   0009  Pico SDK stdio-over-USB on RP2350
+#   000a  Pico SDK stdio-over-USB on RP2040
+#   000c  Raspberry Pi Debug Probe (CMSIS-DAP)
+# The Ageless Device's own product ID is still to be allocated; until then it
+# runs MicroPython or the Pico SDK and appears as 0005, 0009 or 000a.
+
+ACTION=="remove", GOTO="ageless_device_end"
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="2e8a", GOTO="ageless_device_usb"
+GOTO="ageless_device_end"
+
+LABEL="ageless_device_usb"
+SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", TAG+="uaccess"
+SUBSYSTEM=="tty", ATTRS{idProduct}=="0005", SYMLINK+="ageless/micropython-$attr{serial}", TAG+="uaccess", ENV{ID_MM_DEVICE_IGNORE}="1"
+SUBSYSTEM=="tty", ATTRS{idProduct}=="0009|000a", SYMLINK+="ageless/pico-$attr{serial}", TAG+="uaccess", ENV{ID_MM_DEVICE_IGNORE}="1"
+SUBSYSTEM=="tty", ATTRS{idProduct}=="000c", SYMLINK+="ageless/debugprobe-$attr{serial}", TAG+="uaccess", ENV{ID_MM_DEVICE_IGNORE}="1"
+SUBSYSTEM=="hidraw", ATTRS{idProduct}=="000c", TAG+="uaccess"
+
+LABEL="ageless_device_end"

@@ -1,0 +1,26 @@
+Source: ageless-device
+Section: electronics
+Priority: optional
+Maintainer: Ageless Linux <archive@agelesslinux.org>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.0
+Rules-Requires-Root: no
+Homepage: https://agelesslinux.org
+Vcs-Git: https://github.com/agelesslinux/agelesslinux.git
+Vcs-Browser: https://github.com/agelesslinux/agelesslinux
+
+Package: ageless-device
+Architecture: all
+Depends: python3, python3-serial, udev, ${misc:Depends}
+Recommends: picotool, micropython-mpremote, udisks2
+Suggests: thonny, ageless-maker
+Description: Ageless Linux support for the Ageless Device (RP2040/RP2350)
+ Connects Ageless Linux to the Ageless Device, a Raspberry Pi RP2040 or
+ RP2350 handheld with an OLED and a keyboard, and to other RP2040/RP2350
+ boards:
+  * udev rules giving the logged-in user access to the boards in every mode
+    (BOOTSEL, MicroPython, Pico SDK serial, Debug Probe), with stable
+    /dev/ageless/* names for their serial ports;
+  * the ageless-device command: list connected boards, flash UF2 firmware,
+    and copy files to and from MicroPython boards.
+ Wi-Fi sync and the Ageless Store are planned (see docs/ageless-device.md).
