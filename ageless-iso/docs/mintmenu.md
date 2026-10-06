@@ -3,6 +3,11 @@
 > Draft for the blog. Every command here was run on the Ageless Linux tree;
 > the paths are real.
 
+![mintmenu on the Ageless Linux live ISO](screenshots/live-menu.png)
+
+*The Ageless live session with the menu open, captured by `tests/smoke.py`
+(it taps Super through the QEMU monitor).*
+
 On a desktop distro, the menu is the operating system's face. People open
 it to start a browser or a terminal, and after that the OS is out of the
 way. So for Ageless Linux, "doing desktop development" mostly means one
