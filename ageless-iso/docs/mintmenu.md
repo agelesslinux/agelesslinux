@@ -115,7 +115,8 @@ Packaging changes: `debian/changelog` gets a `6.2.3+ageless1` entry (the
 `+ageless1` sorts above Mint's 6.2.3, so our build replaces it), and
 `debian/control` names us as maintainer while keeping Clement Lefebvre as
 `XSBC-Original-Maintainer`. `ageless-desktop-mate` depends on
-`mintmenu (>= 6.2.3+ageless1)`, so an upgrade always brings the fork.
+`mintmenu (>= 6.2.3+ageless1~)` (the `~` admits its development builds), so an
+upgrade always brings the fork.
 
 ## The edit–test loop
 
@@ -152,7 +153,7 @@ ageless-desktop-reset                         # re-apply the panel layout, resta
 ```
 
 Each development build gets a version like
-`6.2.3+ageless1+git20261006.170943.5d9b692`, so apt always sees it as an
+`6.2.3+ageless1~31.gd4fb9c3`, so apt always sees it as an
 upgrade.
 
 ## Ideas for what's next

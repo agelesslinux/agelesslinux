@@ -17,16 +17,61 @@ full-upgrade`; you never need to reimage to get new desktop work.
 
 ## Versions
 
-- **Releases** use the version in `debian/changelog`, e.g. `0.1.1`. Build
-  them with `./build.py --release` (CI does this for `v*` tags).
-- **Development builds** (the default) append
-  `+git<YYYYMMDD>.<HHMMSS>.<commit>`:
-  `0.1.1 < 0.1.1+git20261006.170943.5d9b692 < 0.1.1+git20261007.… < 0.1.2`.
-  A clean checkout uses the commit time, so rebuilding a commit gives
-  identical versions. A checkout with uncommitted changes uses the current
-  time, so every local rebuild is an upgrade.
+Ageless follows the Debian pattern: the version in the changelogs is the
+one being worked *toward*, and git tags mark releases.
+`tools/release.py` holds the rules; `tools/release.py version` prints what
+the current checkout builds.
 
-Bump the changelog (`0.1.1` → `0.1.2`) when you tag a release.
+There are two version numbers:
+
+- **The distro version.** It appears in `os-release` `VERSION`/`PRETTY_NAME`,
+  the ISO file name and the installer. It is `AGELESS_VERSION` from
+  `common/release.env`, plus the development suffix. `VERSION_ID` is always
+  the plain `AGELESS_VERSION`, because the os-release spec doesn't allow `~`.
+- **Debian package versions.** These say what each package is compatible
+  with. Every Ageless-native package has exactly `AGELESS_VERSION`. Forks
+  keep the upstream version plus `+ageless<N>` (mintmenu is
+  `6.2.3+ageless1`). Development builds append the same suffix to both.
+
+| Checkout | Builds | Example |
+|---|---|---|
+| Clean, on tag `v0.1.0` | the release | `0.1.0` |
+| Clean, N commits past the last `v*` tag (or N commits in total, before the first tag) | `~N.g<sha>` | `0.1.0~31.gd4fb9c3` |
+| Uncommitted changes | `~N.g<sha>.dirty<date>.<time>` | `0.1.0~31.gd4fb9c3.dirty20261008.153012` |
+
+`~` sorts *before* everything, even the end of the string, so:
+
+```
+0.1.0~31.gd4fb9c3 < 0.1.0~31.gd4fb9c3.dirty… < 0.1.0~32.g… < 0.1.0 < 0.1.1~1.g… < 0.1.1
+```
+
+Each commit, and each dirty rebuild, is an upgrade over the last, and the
+tagged release lands after all of its development builds. The mintmenu
+fork works the same way: `6.2.3 (Mint) < 6.2.3+ageless1~N.g… < 6.2.3+ageless1`.
+
+### Releasing
+
+```bash
+tools/release.py finalize               # changelogs: UNRELEASED -> timeless, dated now
+git commit -am "Release 0.1.0"
+git tag v0.1.0 && git push origin v0.1.0
+tools/release.py next 0.1.1             # release.env + a new UNRELEASED entry in each changelog
+git commit -am "Start 0.1.1"
+```
+
+- **On a `v*` tag**, CI first runs `tools/release.py check <tag>`, then
+  builds with `--release`.
+- **The check fails** if any of these hold:
+  - the tag doesn't match `AGELESS_VERSION`;
+  - any changelog is still `UNRELEASED`;
+  - a native package's version isn't `AGELESS_VERSION`;
+  - a fork changed since the previous tag without a new `+ageless<N>`.
+- **`build.py` refuses a development build of a version that's already
+  tagged.** It would sort *below* the release. So after tagging, run
+  `next` before building again.
+- **`./build.py --release`** insists on a release build: a clean checkout,
+  on the tag, with the check passing. Without it, a clean checkout on a
+  tag still builds the release.
 
 ## The development loop (no signing key needed)
 
@@ -61,20 +106,19 @@ into each user's dconf on first login. An upgraded `ageless.layout` changes
 the default, not your panel. `--all` also resets theme, fonts, wallpaper and
 mintmenu settings.
 
-### What an upgrade does (tested)
+### What's tested
 
-The upgrade path is tested in a clean trixie container:
-
-1. Install the 0.1.0 packages from the first ISO, including Mint's
-   `mintmenu 6.2.3`.
-2. Sign the archive built from this tree with a throwaway key.
-3. Run `apt full-upgrade`.
-
-Every Ageless package moves to the development version. Mint's mintmenu is
-replaced by the fork, and the new `ageless-system-info` comes in as a new
-dependency. The 0.1.0 conffiles under `/etc/ageless/` are cleaned up by
-`rm_conffile`, and switching stance with `ageless-flagrant on|off
-age-signal` flips `/etc/os-release` both ways.
+- **Every CI run:** `tests/package-test.sh` installs the desktop packages
+  from a signed archive on a clean trixie. It checks that switching stance
+  with `ageless-flagrant on|off age-signal` flips `/etc/os-release` both
+  ways, and that every time capsule resolves.
+- **Upgrades:** given a directory of older `.debs`, the same script
+  installs those first and tests `apt full-upgrade`. That check is run by
+  hand today, and moves into CI once `v0.1.0` exists to upgrade from.
+- **`tests/test_build.py`:**
+  - runs the release cycle above in a scratch git repo;
+  - checks that a fork changed without a bump fails the release check;
+  - checks the version ordering with `dpkg --compare-versions`.
 
 ## The signed archive
 

@@ -87,13 +87,19 @@ packages (`ageless-compliance`, `ageless-refusal`) conflict, so switching
 stance removes one, but its `/etc/ageless/REFUSAL` stayed and the system
 still looked flagrant. Marker files that must come and go with a package
 belong in `/usr/share`, with symlinks into `/etc` (symlinks are not
-conffiles). The old conffiles get dropped with `rm_conffile` in
-`debian/*.maintscript`.
+conffiles). If such files ever shipped as conffiles in a released version,
+drop them on upgrade with `rm_conffile` in `debian/*.maintscript`.
 
 **`dpkg-buildpackage` checks Build-Depends.** A forked upstream package
 (mintmenu needs `dh-python`) fails in a build image that only had what our
 own packages needed. `tools/build-packages.sh` installs missing build
 dependencies when it runs as root.
+
+**`~` is how a development build sorts before its release.** A `+` suffix
+(`0.1.0+git…`) sorts *after* `0.1.0`, so the release build of a version you
+were already testing looks like a downgrade. Version toward the next
+release and use `~` (`0.1.1~14.gabc`), as Debian does; see
+[upgrades.md](upgrades.md#versions).
 
 ## Upstream Mint packages
 

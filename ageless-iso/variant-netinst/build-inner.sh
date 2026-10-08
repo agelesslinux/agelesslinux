@@ -14,7 +14,7 @@ ROOT="$(dirname "$HERE")"
 : "${ARCH:?}" "${STANCE:?}" "${DEBS_DIR:?}" "${WORK_DIR:?}" "${OUT_DIR:?}"
 SNAPSHOT="${SNAPSHOT:-none}"
 
-IMAGE_NAME="ageless-${AGELESS_CODENAME}-${AGELESS_VERSION}-${ARCH}-netinst"
+IMAGE_NAME="ageless-${AGELESS_CODENAME}-${AGELESS_VERSION}${AGELESS_VERSION_SUFFIX:-}-${ARCH}-netinst"
 case "$STANCE" in
     standard) stance_pkgs="ageless-compliance ageless-standard" ;;
     flagrant) stance_pkgs="ageless-refusal ageless-flagrant"; IMAGE_NAME="${IMAGE_NAME}-flagrant" ;;

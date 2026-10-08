@@ -3,6 +3,10 @@
 # caller points AGELESS_RELEASE_ENV elsewhere (e.g. a standalone checkout).
 AGELESS_RELEASE_ENV ?= $(CURDIR)/../../common/release.env
 
+# DEB_VERSION is this build's package version: AGELESS_VERSION plus the
+# development suffix, if any (tools/release.py).
+include /usr/share/dpkg/pkg-info.mk
+
 %:
 	dh $@
 
@@ -14,6 +18,7 @@ override_dh_auto_build:
 	for f in os-release/os-release.in:os-release.base \
 	         desktop/ageless-desktop.gschema.override.in:90_ageless-desktop.gschema.override; do \
 	    sed -e "s|@AGELESS_NAME@|$$AGELESS_NAME|g" \
+	        -e "s|@AGELESS_BUILD_VERSION@|$(DEB_VERSION)|g" \
 	        -e "s|@AGELESS_VERSION@|$$AGELESS_VERSION|g" \
 	        -e "s|@AGELESS_CODENAME@|$$AGELESS_CODENAME|g" \
 	        -e "s|@AGELESS_CODENAME_TITLE@|$$AGELESS_CODENAME_TITLE|g" \

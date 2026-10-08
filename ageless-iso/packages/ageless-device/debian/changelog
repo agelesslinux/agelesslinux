@@ -1,4 +1,4 @@
-ageless-device (0.1.0) timeless; urgency=medium
+ageless-device (0.1.0) UNRELEASED; urgency=medium
 
   * Initial release: udev rules and the ageless-device command.
 

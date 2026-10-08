@@ -65,23 +65,22 @@ def source_date_epoch() -> str:
         return str(int(time.time()))
 
 
-def dev_version_suffix() -> str:
-    """Version suffix for development builds, so apt sees every build as an upgrade.
-
-    0.1.0 < 0.1.0+git20261006.153012.1a2b3c4 < (later builds) < 0.1.1. A clean
-    checkout uses the commit time, so rebuilding a commit gives the same version;
-    a checkout with uncommitted changes uses the current time instead.
-    """
+def build_version(require_release: bool = False):
+    """The version this checkout builds (tools/release.py has the rules)."""
+    sys.path.insert(0, str(ROOT / "tools"))
+    import release as versioning
     try:
-        sha = subprocess.run(["git", "-C", str(ROOT), "rev-parse", "--short=7", "HEAD"],
-                             check=True, capture_output=True, text=True).stdout.strip()
-        dirty = subprocess.run(["git", "-C", str(ROOT), "status", "--porcelain", "--", "."],
-                               check=True, capture_output=True, text=True).stdout.strip() != ""
-    except (OSError, subprocess.CalledProcessError):
-        sha, dirty = "nogit", True
-    import time
-    stamp = time.time() if dirty else int(source_date_epoch())
-    return "+git" + time.strftime("%Y%m%d.%H%M%S", time.gmtime(stamp)) + "." + sha
+        version = versioning.build_version()
+        if require_release:
+            if not version.release:
+                raise versioning.VersionError(
+                    f"--release needs a clean checkout on tag v{version.base}; this is {version.full}")
+            problems = versioning.check(f"v{version.base}")
+            if problems:
+                raise versioning.VersionError("; ".join(problems))
+    except versioning.VersionError as exc:
+        sys.exit(f"error: {exc}")
+    return version
 
 
 def pick_runtime(requested: str) -> str:
@@ -137,9 +136,9 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
                    help="skip the upstream Mint rebuilds (upstream/rebuilds.toml); the desktop then "
                         "lacks mintmenu and mint-themes")
     p.add_argument("--release", action="store_true",
-                   help="build release versions (as in debian/changelog). Without it, package "
-                        "versions get a +git<date>.<time>.<sha> suffix so apt treats each build "
-                        "as an upgrade (see docs/upgrades.md)")
+                   help="insist on a release build: fail unless the checkout is clean and on tag "
+                        "v<AGELESS_VERSION> with finalized changelogs. Any other checkout builds "
+                        "<version>~<commits>.g<sha> development versions (docs/upgrades.md)")
     p.add_argument("--dry-run", action="store_true", help="print the commands instead of running them")
     args = p.parse_args(argv)
     if args.arch != host_arch() and args.variant != "packages":
@@ -151,6 +150,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     release = read_release_env()
+    version = build_version(require_release=args.release)
     output = args.output.resolve()
     if not args.dry_run:
         output.mkdir(parents=True, exist_ok=True)
@@ -163,11 +163,11 @@ def main(argv: list[str] | None = None) -> int:
         "DEBS_DIR": "/out/debs",
         "WORK_DIR": f"/build/{args.variant}-{args.arch}",
         "OUT_DIR": "/out",
-        "AGELESS_VERSION_SUFFIX": "" if args.release else dev_version_suffix(),
+        "AGELESS_VERSION_SUFFIX": version.suffix,
     }
-    print(f"Ageless Linux {release['AGELESS_VERSION']} ({release['AGELESS_CODENAME']}) on Debian "
+    print(f"Ageless Linux {version.full} ({release['AGELESS_CODENAME']}) on Debian "
           f"{release['DEBIAN_SUITE']}: variant={args.variant} arch={args.arch} stance={env['STANCE']} "
-          f"snapshot={args.snapshot} versions={env['AGELESS_VERSION_SUFFIX'] or 'release'} -> {output}")
+          f"snapshot={args.snapshot} {'release' if version.release else 'development'} build -> {output}")
 
     runtime = pick_runtime(args.runtime)
     script = inner_script(args.variant, rebuilds=not args.no_rebuilds)

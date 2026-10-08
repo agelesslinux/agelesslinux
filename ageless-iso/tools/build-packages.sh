@@ -17,22 +17,20 @@ trap 'rm -rf "$SCRATCH"' EXIT
 mkdir -p "$SCRATCH/packages"
 cp -a "$ROOT/common" "$SCRATCH/"
 
-# Development builds append AGELESS_VERSION_SUFFIX (from build.py) to every
-# package version, so apt on an installed system sees each build as an upgrade.
+# Development builds append AGELESS_VERSION_SUFFIX (from build.py, e.g.
+# ~14.gabc1234) to the version at the top of every changelog. "~" sorts before
+# the release, so 0.1.0~14.gabc1234 < 0.1.0. Release builds (empty suffix)
+# must come from finalized changelogs. See tools/release.py.
 SUFFIX="${AGELESS_VERSION_SUFFIX:-}"
 
-add_dev_changelog() {  # <package dir>
-    local dir="$1" source version stamp
-    source="$(dpkg-parsechangelog -l "$dir/debian/changelog" -S Source)"
-    version="$(dpkg-parsechangelog -l "$dir/debian/changelog" -S Version)"
-    stamp="$(date -u -R -d "@$SOURCE_DATE_EPOCH")"
-    {
-        printf '%s (%s%s) UNRELEASED; urgency=medium\n\n' "$source" "$version" "$SUFFIX"
-        printf '  * Development build.\n\n'
-        printf ' -- Ageless Linux <archive@agelesslinux.org>  %s\n\n' "$stamp"
-        cat "$dir/debian/changelog"
-    } > "$dir/debian/changelog.new"
-    mv "$dir/debian/changelog.new" "$dir/debian/changelog"
+set_build_version() {  # <package dir>
+    local changelog="$1/debian/changelog" dist
+    dist="$(dpkg-parsechangelog -l "$changelog" -S Distribution)"
+    if [[ -z "$SUFFIX" && "$dist" == UNRELEASED ]]; then
+        echo "E: $(basename "$1"): release build, but debian/changelog is UNRELEASED (tools/release.py finalize)" >&2
+        exit 1
+    fi
+    [[ -z "$SUFFIX" ]] || sed -i "1s/(\([^)]*\))/(\1${SUFFIX})/" "$changelog"
 }
 
 for src in "$ROOT"/packages/*/; do
@@ -44,7 +42,7 @@ for src in "$ROOT"/packages/*/; do
     fi
     echo "I: building $name${SUFFIX:+ (version suffix $SUFFIX)}"
     cp -a "$src" "$SCRATCH/packages/$name"
-    [[ -z "$SUFFIX" ]] || add_dev_changelog "$SCRATCH/packages/$name"
+    set_build_version "$SCRATCH/packages/$name"
     # An older build image may lack a build dependency; install it if we can.
     if ! (cd "$SCRATCH/packages/$name" && dpkg-checkbuilddeps >/dev/null 2>&1) && [[ $EUID -eq 0 ]]; then
         echo "I: installing build dependencies for $name"

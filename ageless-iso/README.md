@@ -20,8 +20,9 @@ only Python 3 and Podman or Docker.
 ./build.py --variant netinst              # netinstall ISO: stock debian-installer + preseed
 ./build.py --variant live --flagrant      # flagrant mode (ageless-refusal)
 ./build.py --variant packages             # just the .debs (out/debs/) and an apt archive (out/repo/)
-./build.py --variant packages --release   # release versions (default: +git<date>.<time>.<sha> dev versions)
+./build.py --variant packages --release   # insist on a release build (clean checkout on tag v<version>)
 ./build.py --variant live --dry-run       # show the container commands
+tools/release.py version                  # the version this checkout builds, e.g. 0.1.0~31.gd4fb9c3
 ```
 
 Output goes to `out/`: the ISO, its `.sha256`, the package manifest and the

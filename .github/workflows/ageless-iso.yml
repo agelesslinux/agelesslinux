@@ -1,7 +1,8 @@
 # Ageless Linux ISO pipeline.
 #   push / PR touching ageless-iso/  -> lint, build .debs, build + smoke-test ISOs
-#   tag v*                           -> same, pinned to the snapshot, release versions,
-#                                       plus a draft GitHub Release
+#   tag v*                           -> release gate (tools/release.py check), then the same,
+#                                       pinned to the snapshot, release versions, plus a draft
+#                                       GitHub Release
 #   push to main                     -> also publishes the signed apt archive to GitHub
 #                                       Pages, once enabled (docs/upgrades.md)
 #   workflow_dispatch                -> manual run, optionally flagrant / pinned
@@ -38,6 +39,10 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }   # tags and history, for tools/release.py
+      - name: Release gate (v* tags)
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: python3 tools/release.py check "$GITHUB_REF_NAME"
       - name: shellcheck
         run: |
           sudo apt-get install -y -qq shellcheck

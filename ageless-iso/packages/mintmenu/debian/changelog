@@ -1,4 +1,4 @@
-mintmenu (6.2.3+ageless1) timeless; urgency=medium
+mintmenu (6.2.3+ageless1) UNRELEASED; urgency=medium
 
   * Ageless Linux fork of linuxmint/mintmenu@b0ff4eb (6.2.3).
   * Uninstall and "Install package" work on Debian: new apt-helper.py

@@ -2,6 +2,10 @@
 AGELESS_RELEASE_ENV ?= $(CURDIR)/../../common/release.env
 BRANDING = calamares/branding/ageless
 
+# DEB_VERSION is this build's package version: AGELESS_VERSION plus the
+# development suffix, if any (tools/release.py).
+include /usr/share/dpkg/pkg-info.mk
+
 %:
 	dh $@
 
@@ -10,7 +14,8 @@ override_dh_auto_build:
 	mkdir -p build
 	set -a; . "$(AGELESS_RELEASE_ENV)"; \
 	AGELESS_CODENAME_TITLE="$$(echo $$AGELESS_CODENAME | sed 's/^./\U&/')"; \
-	sed -e "s|@AGELESS_VERSION@|$$AGELESS_VERSION|g" \
+	sed -e "s|@AGELESS_BUILD_VERSION@|$(DEB_VERSION)|g" \
+	    -e "s|@AGELESS_VERSION@|$$AGELESS_VERSION|g" \
 	    -e "s|@AGELESS_CODENAME_TITLE@|$$AGELESS_CODENAME_TITLE|g" \
 	    templates/branding.desc.in > $(BRANDING)/branding.desc
 	rsvg-convert -w 128 -h 128 artwork/ageless-logo.svg -o $(BRANDING)/ageless-logo.png

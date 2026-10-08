@@ -1,4 +1,4 @@
-calamares-settings-ageless (0.1.0) timeless; urgency=medium
+calamares-settings-ageless (0.1.0) UNRELEASED; urgency=medium
 
   * Fork calamares-settings-debian 13.0.13-1 for Ageless Linux: rename the
     branding, launcher and helpers; MATE live-session overrides; enable the

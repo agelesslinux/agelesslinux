@@ -70,7 +70,7 @@ Package: ageless-desktop-mate
 Architecture: all
 Depends: ageless-standard | ageless-flagrant,
          mate-desktop-environment-core,
-         mintmenu (>= 6.2.3+ageless1),
+         mintmenu (>= 6.2.3+ageless1~),
          mint-themes,
          ageless-system-info,
          mint-y-icons,

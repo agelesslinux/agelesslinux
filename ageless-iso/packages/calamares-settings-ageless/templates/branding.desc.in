@@ -10,9 +10,9 @@ windowPlacement: center
 strings:
     productName:         Ageless Linux
     shortProductName:    Ageless
-    version:             "@AGELESS_VERSION@"
+    version:             "@AGELESS_BUILD_VERSION@"
     shortVersion:        "@AGELESS_VERSION@"
-    versionedName:       Ageless Linux @AGELESS_VERSION@ (@AGELESS_CODENAME_TITLE@)
+    versionedName:       Ageless Linux @AGELESS_BUILD_VERSION@ (@AGELESS_CODENAME_TITLE@)
     shortVersionedName:  Ageless @AGELESS_VERSION@
     bootloaderEntryName: Ageless
     productUrl:          https://agelesslinux.org

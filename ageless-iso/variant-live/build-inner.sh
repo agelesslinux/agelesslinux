@@ -10,6 +10,7 @@
 #   WORK_DIR   scratch directory for the live-build tree
 #   OUT_DIR    where the finished ISO + checksums land
 #   SNAPSHOT   snapshot.debian.org timestamp, or "none"
+#   AGELESS_VERSION_SUFFIX  development-build suffix for the ISO name (tools/release.py)
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -20,7 +21,7 @@ ROOT="$(dirname "$HERE")"
 : "${ARCH:?}" "${STANCE:?}" "${DEBS_DIR:?}" "${WORK_DIR:?}" "${OUT_DIR:?}"
 SNAPSHOT="${SNAPSHOT:-none}"
 
-IMAGE_NAME="ageless-${AGELESS_CODENAME}-${AGELESS_VERSION}-${ARCH}-live"
+IMAGE_NAME="ageless-${AGELESS_CODENAME}-${AGELESS_VERSION}${AGELESS_VERSION_SUFFIX:-}-${ARCH}-live"
 [[ "$STANCE" == flagrant ]] && IMAGE_NAME="${IMAGE_NAME}-flagrant"
 
 if [[ "$SNAPSHOT" != none ]]; then
@@ -66,7 +67,7 @@ lb config \
     --firmware-binary false \
     --cache-packages false \
     --checksums sha256 \
-    --image-name "$IMAGE_NAME" \
+    --image-name "ageless-${ARCH}" \
     --iso-application "$AGELESS_NAME" \
     --iso-preparer "Ageless Linux build.py; https://github.com/agelesslinux/agelesslinux" \
     --iso-publisher "Ageless Linux; https://agelesslinux.org" \
