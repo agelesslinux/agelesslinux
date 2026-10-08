@@ -20,10 +20,13 @@ quiet apt-get install -y -qq --no-install-recommends gnupg python3 ca-certificat
 
 if [[ -n "$OLD" ]]; then
     step "install previous release from $OLD"
-    quiet apt-get install -y -qq --no-install-recommends \
-        "$OLD"/ageless-os-release_*.deb "$OLD"/ageless-compliance_*.deb "$OLD"/ageless-agelessd_*.deb \
-        "$OLD"/ageless-standard_*.deb "$OLD"/mintmenu_*.deb "$OLD"/mint-themes_*.deb \
-        "$OLD"/mint-x-icons_*.deb "$OLD"/ageless-desktop-mate_*.deb
+    old_debs=()
+    for pkg in ageless-os-release ageless-compliance ageless-agelessd ageless-standard \
+               ageless-system-info ageless-desktop-mate mintmenu mint-themes mint-x-icons \
+               xapp-symbolic-icons; do
+        compgen -G "$OLD/${pkg}_*.deb" >/dev/null && old_debs+=("$OLD/${pkg}"_*.deb)
+    done
+    quiet apt-get install -y -qq --no-install-recommends "${old_debs[@]}"
     dpkg-query -W 'ageless-*' mintmenu | awk 'NF == 2'
 fi
 
